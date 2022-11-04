@@ -21,3 +21,10 @@ terraform {
 provider "aws" {
   region = "us-east-1"
 }
+
+
+## 1. Call IAM user create module to create user profile for profbob
+module "iam" {
+  source = "./module/iam"
+  
+}

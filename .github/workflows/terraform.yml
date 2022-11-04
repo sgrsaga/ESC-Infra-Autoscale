@@ -51,7 +51,7 @@ jobs:
     # On push to "main", build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
       id: apply
-      if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve
       # Terraform Destroy
     #- name: Terraform Destroy

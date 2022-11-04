@@ -77,8 +77,8 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        role-to-assume: ${{env.AWS_ROLE_ASSUME}}
-        role-session-name: k8s_terra_session
+        role-to-assume: arn:aws:iam::201369566049:role/git_hub_actions
+        role-session-name: project_terra_session
         aws-region: ${{env.AWS_REGION}}
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.

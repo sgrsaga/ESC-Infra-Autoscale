@@ -52,6 +52,7 @@ on:
 
 env:
   AWS_REGION : "us-east-1"
+  AWS_ROLE_ASSUME : ${{ secrets.AWS_ROLE_ASSUME }}
 
 permissions:
   id-token: write

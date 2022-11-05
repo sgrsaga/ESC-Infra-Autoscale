@@ -28,3 +28,19 @@ module "iam" {
   source = "./module/iam"
   
 }
+
+## 2. Call the Network module to generate VPC components
+module "main_network" {
+  source = "./module/network"
+  vpc_name = var.vpc_name
+  vpc_cidr = var.vpc_cidr
+  public_source_cidr = var.public_source_cidr
+  public_source_cidr_v6 = var.public_source_cidr_v6
+  ig_name = var.ig_name
+
+  public_subnets = var.public_subnets
+  private_subnets = var.private_subnets
+  public_access_sg_ingress_rules = var.public_access_sg_ingress_rules
+  public_rt = var.public_rt
+  private_rt = var.private_rt
+}

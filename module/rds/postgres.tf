@@ -4,6 +4,12 @@ module "main_network" {
   source = "../main_network"
 }
 */
+## Get Private Security Group to apply for the Database
+data "aws_security_group" "private_sg" {
+  tags = {
+    Name = "PRIVATE_SG"
+  }
+}
 
 ## Get Private SubnetList
 data "aws_subnet_ids" "private_subnets" {
@@ -12,14 +18,6 @@ data "aws_subnet_ids" "private_subnets" {
     Access = "PRIVATE"
   }
 }
-
-## Get Private Security Group
-data "aws_security_group" "private_sg" {
-  tags = {
-    Name = "PRIVATE_SG"
-  }
-}
-
 
 ## Create subnet group
 resource "aws_db_subnet_group" "db_subnet_group" {
@@ -30,7 +28,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
   }
 }
 
-## Create Password
+## Create random Password
 resource "random_password" "db_master_pass"{
   length           = 12
   special          = true
@@ -40,13 +38,13 @@ resource "random_password" "db_master_pass"{
 resource "aws_secretsmanager_secret" "db_password" {
   name = "postgres-db-password"
 }
-## Set the secret version
+## Set the secret version with value of the random generator
 resource "aws_secretsmanager_secret_version" "password" {
   secret_id = aws_secretsmanager_secret.db_password.id
   secret_string = random_password.db_master_pass.result
 }
 
-## Get the password with name
+## Get the password by name
 data "aws_secretsmanager_secret" "get_db_password" {
   name = "postgres-db-password"
   depends_on = [

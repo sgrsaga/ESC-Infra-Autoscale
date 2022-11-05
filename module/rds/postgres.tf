@@ -13,6 +13,14 @@ data "aws_subnet_ids" "private_subnets" {
   }
 }
 
+## Get Private Security Group
+data "aws_security_group" "private_sg" {
+  tags = {
+    Name = "PRIVATE_SG"
+  }
+}
+
+
 ## Create subnet group
 resource "aws_db_subnet_group" "db_subnet_group" {
   name       = var.db_subnet_group_name
@@ -75,7 +83,7 @@ resource "aws_db_instance" "postgress_database" {
     backup_retention_period = var.db_backup_retention_period
     multi_az = var.muli_az_enable
     db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
-    vpc_security_group_ids = var.vpc_security_group_ids
+    vpc_security_group_ids = data.aws_security_group.private_sg.id
     iam_database_authentication_enabled = true
     final_snapshot_identifier = "final-snap"
     skip_final_snapshot = false

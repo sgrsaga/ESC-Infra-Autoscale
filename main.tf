@@ -50,7 +50,6 @@ module "pg_database" {
   source = "./module/rds"
   db_identifier = var.db_identifier
   vpc_id = module.main_network.vpc_id
-  vpc_security_group_ids = [module.network.private_security_group]
   db_name = var.db_name
   depends_on = [module.network] 
 }

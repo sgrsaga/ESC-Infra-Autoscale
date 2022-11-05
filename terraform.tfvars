@@ -40,3 +40,20 @@ public_access_sg_ingress_rules = [
       to_port = 0
     }
   ]
+
+  ### ------------- Database related Variables
+db_identifier = "project-db"
+db_backup_retention_period = 7
+db_class = "db.t3.micro"
+db_delete_protect = "false"
+db_engine = "postgres"
+db_engine_version = "12.9"
+db_name = "Project_db"
+db_para_group_name = "default.postgres12"
+#db_pass = "Test-NotHere"
+db_storage = 100
+db_storage_type = "gp2"
+db_username = "Project"
+is_storage_encrypted = "true"
+max_allocated_storage_value = 500
+muli_az_enable = "true"

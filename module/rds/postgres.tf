@@ -88,7 +88,7 @@ resource "aws_db_instance" "postgress_database" {
     final_snapshot_identifier = "final-snap"
     skip_final_snapshot = false
     copy_tags_to_snapshot = true
-    monitoring_role_arn = var.monitoring_role
+    #monitoring_role_arn = var.monitoring_role
     monitoring_interval = 60
     enabled_cloudwatch_logs_exports = ["postgresql"]
     deletion_protection = var.db_delete_protect

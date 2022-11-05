@@ -46,17 +46,17 @@ resource "aws_secretsmanager_secret_version" "password" {
   secret_string = random_password.db_master_pass.result
 }
 
-## Get the password
-data "aws_secretsmanager_secret" "db_password" {
+## Get the password with name
+data "aws_secretsmanager_secret" "get_db_password" {
   name = "postgres-db-password"
   depends_on = [
     aws_secretsmanager_secret.db_password,
     aws_secretsmanager_secret_version.password
   ]
 }
-
-data "aws_secretsmanager_secret_version" "password" {
-  secret_id = data.aws_secretsmanager_secret.db_password
+## Get the Secret ID
+data "aws_secretsmanager_secret_version" "get_password_version" {
+  secret_id = data.aws_secretsmanager_secret.get_db_password.id
   depends_on = [
     aws_secretsmanager_secret.db_password,
     aws_secretsmanager_secret_version.password
@@ -74,7 +74,7 @@ resource "aws_db_instance" "postgress_database" {
     instance_class = var.db_class
     name = var.db_name
     username = var.db_username
-    password = data.aws_secretsmanager_secret_version.password
+    password = data.aws_secretsmanager_secret_version.get_password_version.secret_string
     #password = data.aws_secretsmanager_secret_version.password
     #password = aws_secretsmanager_secret_version.password.secret_string
     #parameter_group_name = var.db_para_group_name

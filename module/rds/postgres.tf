@@ -75,7 +75,7 @@ resource "aws_iam_role" "rds_role" {
         Effect = "Allow"
         Sid    = ""
         Principal = {
-          Service = "rds.amazonaws.com"
+          Service = "monitoring.rds.amazonaws.com"
         }
       },
     ]
@@ -90,17 +90,34 @@ resource "aws_iam_role_policy" "rds_policy" {
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
   policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = [
-          "rds:*",
-        ]
-        Effect   = "Allow"
-        Resource = "*"
-      },
-    ]
-  })
+	Version: "2012-10-17",
+	Statement: [
+		{
+			Sid: "EnableCreationAndManagementOfRDSCloudwatchLogGroups",
+			Effect: "Allow",
+			Action: [
+				"logs:CreateLogGroup",
+				"logs:PutRetentionPolicy"
+			],
+			Resource: [
+				"arn:aws:logs:*:*:log-group:RDS*"
+			]
+		},
+		{
+			Sid: "EnableCreationAndManagementOfRDSCloudwatchLogStreams",
+			Effect: "Allow",
+			Action: [
+				"logs:CreateLogStream",
+				"logs:PutLogEvents",
+				"logs:DescribeLogStreams",
+				"logs:GetLogEvents"
+			],
+			Resource: [
+				"arn:aws:logs:*:*:log-group:RDS*:log-stream:*"
+			]
+		}
+	]
+})
 }
 
 

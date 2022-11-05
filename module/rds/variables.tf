@@ -81,7 +81,7 @@ variable "is_storage_encrypted" {
 ## DB deletion protection
 variable "db_delete_protect" {
     type = string
-    default = "true"
+    default = "false"
 }
 ## Database subnet group name
 variable "db_subnet_group_name" {

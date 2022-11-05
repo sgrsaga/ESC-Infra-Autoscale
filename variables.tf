@@ -168,5 +168,5 @@ variable "db_subnet_group_name" {
 ## DB deletion protection
 variable "db_delete_protect" {
     type = string
-    default = "true"
+    default = "false"
 }

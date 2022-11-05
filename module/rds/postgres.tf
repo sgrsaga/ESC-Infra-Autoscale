@@ -63,6 +63,46 @@ data "aws_secretsmanager_secret_version" "get_password_version" {
   ]
 }
 
+## Create a Monitoring role
+resource "aws_iam_role" "rds_role" {
+  name = "rds_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "rds.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+## Creating ppolicy
+resource "aws_iam_role_policy" "rds_policy" {
+  name = "rds_policy"
+  role = aws_iam_role.rds_role.id
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "rds:*",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
 
 ## Create Postgres Database Instance
 resource "aws_db_instance" "postgress_database" {
@@ -88,7 +128,7 @@ resource "aws_db_instance" "postgress_database" {
     final_snapshot_identifier = "final-snap"
     skip_final_snapshot = false
     copy_tags_to_snapshot = true
-    #monitoring_role_arn = var.monitoring_role
+    monitoring_role_arn = aws_iam_role.rds_role.arn
     monitoring_interval = 60
     enabled_cloudwatch_logs_exports = ["postgresql"]
     deletion_protection = var.db_delete_protect

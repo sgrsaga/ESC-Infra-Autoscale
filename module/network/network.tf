@@ -182,6 +182,7 @@ resource "aws_nat_gateway" "gateway_for_private_sn" {
 resource "aws_route" "link_nat_gateway" {
   route_table_id = aws_route_table.private_route.id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id = aws_nat_gateway.gateway_for_private_sn.id
+  #nat_gateway_id = aws_nat_gateway.gateway_for_private_sn.id
+  nat_gateway_id = element(aws_nat_gateway.gateway_for_private_sn.*.id, 0)
   depends_on = [aws_eip.nat_public_ip,aws_route_table.private_route, aws_subnet.public_subnet]
 }

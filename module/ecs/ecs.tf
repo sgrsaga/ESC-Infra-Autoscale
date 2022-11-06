@@ -81,7 +81,7 @@ data "aws_subnets" "public_subnets" {
 resource "aws_s3_bucket" "alb_access_log_s3" {
   bucket = "kc4n2i7lgqsiyvundstess-test-project"
   force_destroy = true
-  acl = "log-delivery-write"
+  acl = "aws_s3_bucket_acl"
   tags = {
     Name = "ALB-Access-Log"
   }

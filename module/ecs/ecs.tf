@@ -77,7 +77,7 @@ data "aws_subnets" "public_subnets" {
     }
 }
 
-
+/*
 ## Get the service account for S3 access
 data "aws_elb_service_account" "main" {}
 
@@ -109,44 +109,6 @@ resource "aws_s3_bucket" "alb_access_log_s3" {
 }
 POLICY
 }
-
-
-
-/*
-## S3 bucket acl
-resource "aws_s3_bucket_acl" "lb_access_logs_acl" {
-  bucket = aws_s3_bucket.alb_access_log_s3.id
-  acl    = "private"
-}
-
-## Set Policy
-data "aws_iam_policy_document" "allow_s3_lb" {
-  statement {
-    principals {
-      type        = "Service"
-      identifiers = ["logdelivery.elb.amazonaws.com"]
-    }
-    actions = [
-      "s3:PutObject"
-    ]
-    resources = [
-      "${aws_s3_bucket.alb_access_log_s3.arn}/*"
-    ]
-    condition {
-      test     = "StringEquals"
-      variable = "s3:x-amz-acl"
-      values = [
-        "bucket-owner-full-control"
-      ]
-    }
-  }
-}
-
-# AWS S3 bucket policy setup
-resource "aws_s3_bucket_policy" "s3_bucket_policy" {
-  bucket = aws_s3_bucket.alb_access_log_s3.id
-  policy = data.aws_iam_policy_document.allow_s3_lb.json
-}
 */
 
 resource "aws_lb" "ecs_lb" {
@@ -157,13 +119,13 @@ resource "aws_lb" "ecs_lb" {
   subnets            = data.aws_subnets.public_subnets.ids
 
   enable_deletion_protection = false
-
+  /*
   access_logs {
     bucket  = aws_s3_bucket.alb_access_log_s3.bucket
     prefix  = "alb-access-log"
     enabled = true
   }
-
+  */
   tags = {
     Environment = "Test"
   }

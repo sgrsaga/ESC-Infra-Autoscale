@@ -73,7 +73,7 @@ data "aws_security_group" "public_sg" {
 data "aws_subnets" "public_subnets" {
     filter {
       name = "tag:Access"
-      values = ["PRIVATE"]
+      values = ["PUBLIC"]
     }
 /*
   vpc_id = var.vpc_id

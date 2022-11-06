@@ -80,7 +80,7 @@ resource "aws_iam_role" "rds_role" {
   })
 }
 
-## Creating ppolicy
+## Creating policy
 resource "aws_iam_role_policy" "rds_policy" {
   name = "rds_policy"
   role = aws_iam_role.rds_role.id

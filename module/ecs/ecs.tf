@@ -85,7 +85,7 @@ data "aws_subnets" "public_subnets" {
 
 ## Create S3 bucket for Access logs
 resource "aws_s3_bucket" "alb_access_log_s3" {
-  bucket = "KC4N2I7LgQsIYvundSTEsS-test-project"
+  bucket = "kc4n2i7lgqsiyvundstess-test-project"
 
   tags = {
     Name        = "ALB-Access-Log"
@@ -128,7 +128,7 @@ resource "aws_lb_target_group" "ecs_alb_tg" {
 
 # 05. Create ECR repository for the image to store
 resource "aws_ecr_repository" "project_repo" {
-  name                 = "ProjectRepo"
+  name                 = "project_repo_aws"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {

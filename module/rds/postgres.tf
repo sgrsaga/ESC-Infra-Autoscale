@@ -22,7 +22,7 @@ data "aws_subnets" "private_subnets" {
 ## Create subnet group
 resource "aws_db_subnet_group" "db_subnet_group" {
   name       = var.db_subnet_group_name
-  subnet_ids = data.aws_subnet_ids.private_subnets.ids
+  subnet_ids = [for subnet in data.aws_subnets.private_subnets.ids : subnet.id]
   tags = {
     Name = var.db_subnet_group_name
   }

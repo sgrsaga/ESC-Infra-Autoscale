@@ -85,7 +85,6 @@ data "aws_elb_service_account" "main" {}
 resource "aws_s3_bucket" "alb_access_log_s3" {
   bucket = "kc4n2i7lgqsiyvundstess-test-project"
   force_destroy = true
-  acl = "private"
   tags = {
     Name = "ALB-Access-Log"
   }
@@ -99,7 +98,7 @@ resource "aws_s3_bucket" "alb_access_log_s3" {
         "s3:PutObject"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.alb_access_log_s3}/ALBLogs/*",
+      "Resource": "*",
       "Principal": {
         "AWS": [
           "${data.aws_elb_service_account.main.arn}"

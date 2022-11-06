@@ -135,7 +135,7 @@ resource "aws_lb" "ecs_lb" {
 resource "aws_lb_target_group" "ecs_alb_tg" {
   name     = "ecs-alb-tg"
   target_type = "instance"
-  port     = 80
+  port     = 8000
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 }

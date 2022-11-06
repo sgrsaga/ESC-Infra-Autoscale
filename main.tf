@@ -58,5 +58,5 @@ module "pg_database" {
 module "ecs_cluster" {
   source = "./module/ecs"
   vpc_id = module.main_network.vpc_id
-  depends_on = [module.main_network] 
+  depends_on = [module.main_network]
 }

@@ -77,6 +77,10 @@ data "aws_subnets" "public_subnets" {
     }
 }
 
+
+## Get the service account for S3 access
+data "aws_elb_service_account" "main" {}
+
 ## Create S3 bucket for Access logs
 resource "aws_s3_bucket" "alb_access_log_s3" {
   bucket = "kc4n2i7lgqsiyvundstess-test-project"
@@ -85,7 +89,31 @@ resource "aws_s3_bucket" "alb_access_log_s3" {
   tags = {
     Name = "ALB-Access-Log"
   }
+  policy = <<POLICY
+{
+  "Id": "Policy",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:PutObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "${aws_s3_bucket.alb_access_log_s3}/ALBLogs/*",
+      "Principal": {
+        "AWS": [
+          "${data.aws_elb_service_account.main.arn}"
+        ]
+      }
+    }
+  ]
 }
+POLICY
+}
+
+
+
+/*
 ## S3 bucket acl
 resource "aws_s3_bucket_acl" "lb_access_logs_acl" {
   bucket = aws_s3_bucket.alb_access_log_s3.id
@@ -120,7 +148,7 @@ resource "aws_s3_bucket_policy" "s3_bucket_policy" {
   bucket = aws_s3_bucket.alb_access_log_s3.id
   policy = data.aws_iam_policy_document.allow_s3_lb.json
 }
-
+*/
 
 resource "aws_lb" "ecs_lb" {
   name               = "ecs-lb"

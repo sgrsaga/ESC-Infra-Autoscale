@@ -13,10 +13,10 @@ data "aws_security_group" "private_sg" {
 
 ## Get Private SubnetList
 data "aws_subnets" "private_subnets" {
-  vpc_id = var.vpc_id
-  tags = {
-    Access = "PRIVATE"
-  }
+  filter {
+      name = "tag:Access"
+      values = ["PRIVATE"]
+    }
 }
 
 ## Create subnet group

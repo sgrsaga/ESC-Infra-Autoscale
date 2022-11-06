@@ -75,12 +75,6 @@ data "aws_subnets" "public_subnets" {
       name = "tag:Access"
       values = ["PUBLIC"]
     }
-/*
-  vpc_id = var.vpc_id
-  tags = {
-    Access = "PRIVATE"
-  }
-*/
 }
 
 ## Create S3 bucket for Access logs

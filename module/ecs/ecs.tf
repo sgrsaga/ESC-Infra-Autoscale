@@ -27,7 +27,7 @@ resource "aws_iam_role" "ecs_role" {
 ## Creating policy
 resource "aws_iam_role_policy" "ecs_policy" {
   name = "ecs_policy"
-  role = aws_iam_role.rds_role.id
+  role = aws_iam_role.ecs_role.id
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
@@ -70,7 +70,7 @@ data "aws_security_group" "public_sg" {
 }
 
 ## Get Public SubnetList
-data "aws_subnet_ids" "public_subnets" {
+data "aws_subnets" "public_subnets" {
   vpc_id = var.vpc_id
   tags = {
     Access = "PRIVATE"
@@ -92,7 +92,7 @@ resource "aws_s3_bucket_acl" "s3_bucket_acl" {
 }
 
 resource "aws_lb" "ecs_lb" {
-  name               = "ecs_lb"
+  name               = "ecs-lb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [data.aws_security_group.public_sg.id]
@@ -164,6 +164,9 @@ resource "aws_ecs_task_definition" "service" {
     name      = "service-storage"
     host_path = "/ecs/service-storage"
   }
+  depends_on = [
+    aws_ecr_repository.project_repo
+  ]
 }
 
 # 08. Service configuration
@@ -173,11 +176,12 @@ resource "aws_ecs_service" "node_app" {
   task_definition = aws_ecs_task_definition.service.arn
   desired_count   = 3
   iam_role        = aws_iam_role.ecs_role.arn
-  depends_on      = [aws_iam_role_policy.ecs_policy]
+  depends_on      = [aws_iam_role_policy.ecs_policy, aws_ecs_cluster.project_cluster, aws_ecs_task_definition.service]
 
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_alb_tg.arn
     container_name   = "AppTask"
     container_port   = 80
   }
+  
 }

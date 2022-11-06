@@ -60,3 +60,14 @@ module "ecs_cluster" {
   vpc_id = module.main_network.vpc_id
   depends_on = [module.main_network] 
 }
+
+## 4.1 Call ECS service autoscaling module
+module "ecs-service-autoscaling" {
+  source  = "cn-terraform/ecs-service-autoscaling/aws"
+  version = "1.0.6"
+  name_prefix = "Project_prefix"
+  ecs_service_name = module.ecs_cluster.ecs_service_name
+  ecs_cluster_name = module.ecs_cluster.ecs_cluster_name
+  # insert the 3 required variables here
+  depends_on = [module.ecs_cluster]
+}

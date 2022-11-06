@@ -77,39 +77,6 @@ data "aws_subnets" "public_subnets" {
     }
 }
 
-/*
-## Get the service account for S3 access
-data "aws_elb_service_account" "main" {}
-
-## Create S3 bucket for Access logs
-resource "aws_s3_bucket" "alb_access_log_s3" {
-  bucket = "kc4n2i7lgqsiyvundstess-test-project"
-  force_destroy = true
-  tags = {
-    Name = "ALB-Access-Log"
-  }
-  policy = <<POLICY
-{
-  "Id": "Policy",
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "s3:PutObject"
-      ],
-      "Effect": "Allow",
-      "Resource": "*",
-      "Principal": {
-        "AWS": [
-          "${data.aws_elb_service_account.main.arn}"
-        ]
-      }
-    }
-  ]
-}
-POLICY
-}
-*/
 
 resource "aws_lb" "ecs_lb" {
   name               = "ecs-lb"
@@ -171,6 +138,7 @@ resource "aws_ecs_cluster" "project_cluster" {
   }
 }
 
+
 # 07. Task definitions to use in Service
 resource "aws_ecs_task_definition" "project_task" {
   family = "project_task"
@@ -185,7 +153,7 @@ resource "aws_ecs_task_definition" "project_task" {
       portMappings = [
         {
           containerPort = 80
-          hostPort      = 80
+          hostPort      = 8000
         }
       ]
     }
@@ -217,3 +185,4 @@ resource "aws_ecs_service" "service_node_app" {
   }
   
 }
+

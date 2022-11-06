@@ -140,6 +140,17 @@ resource "aws_lb_target_group" "ecs_alb_tg" {
   vpc_id   = var.vpc_id
 }
 
+# Links ALB to TG with lister rule
+resource "aws_lb_listener" "alb_to_tg" {
+  load_balancer_arn = aws_lb.ecs_lb.arn
+  port = 80
+  protocol = "HTTP"
+  default_action {
+    target_group_arn = aws_lb_target_group.ecs_alb_tg.id
+    type = "forward"
+  }
+}
+
 # 05. Create ECR repository for the image to store
 resource "aws_ecr_repository" "project_repo" {
   name                 = "project_repo_aws"
@@ -197,6 +208,7 @@ resource "aws_ecs_service" "service_node_app" {
   desired_count   = 3
   iam_role        = aws_iam_role.ecs_role.arn
   depends_on      = [aws_iam_role_policy.ecs_policy, aws_ecs_cluster.project_cluster, aws_ecs_task_definition.project_task]
+  
 
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_alb_tg.arn

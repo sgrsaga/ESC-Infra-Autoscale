@@ -56,6 +56,9 @@ resource "aws_iam_role_policy" "ecs_policy" {
 		}
 	]
 })
+  depends_on = [
+    aws_iam_role.ecs_role
+  ]
 }
 
 # 03. Application Load balancer
@@ -92,7 +95,7 @@ resource "aws_lb" "ecs_lb" {
   name               = "ecs_lb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [data.aws_security_group.public_sg.ids]
+  security_groups    = [data.aws_security_group.public_sg.id]
   subnets            = [data.aws_subnet_ids.public_subnets.ids]
 
   enable_deletion_protection = false
@@ -110,7 +113,7 @@ resource "aws_lb" "ecs_lb" {
 
 # 04. Target Group for ALB
 resource "aws_lb_target_group" "ecs_alb_tg" {
-  name     = "ecs_alb_tg"
+  name     = "ecs-alb-tg"
   target_type = "instance"
   port     = 80
   protocol = "HTTP"

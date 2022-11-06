@@ -96,7 +96,7 @@ resource "aws_lb" "ecs_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [data.aws_security_group.public_sg.id]
-  subnets            = "${data.aws_subnets.public_subnets.*.id}"
+  subnets            = "${data.aws_subnets.public_subnets.*.ids}"
 
   enable_deletion_protection = false
 
@@ -141,8 +141,8 @@ resource "aws_ecs_cluster" "project_cluster" {
 }
 
 # 07. Task definitions to use in Service
-resource "aws_ecs_task_definition" "project_task" {
-  family = "project_task"
+resource "aws_ecs_task_definition" "service" {
+  family = "project_service"
   execution_role_arn = aws_iam_role.ecs_role.arn
   container_definitions = jsonencode([
     {
@@ -168,10 +168,10 @@ resource "aws_ecs_task_definition" "project_task" {
     aws_ecr_repository.project_repo
   ]
 }
-
+/*
 # 08. Service configuration
-resource "aws_ecs_service" "service_node_app" {
-  name            = "service_node_app"
+resource "aws_ecs_service" "node_app" {
+  name            = "node_app"
   cluster         = aws_ecs_cluster.project_cluster.id
   task_definition = aws_ecs_task_definition.service.arn
   desired_count   = 3
@@ -185,3 +185,4 @@ resource "aws_ecs_service" "service_node_app" {
   }
   
 }
+*/

@@ -71,10 +71,16 @@ data "aws_security_group" "public_sg" {
 
 ## Get Public SubnetList
 data "aws_subnets" "public_subnets" {
+    filter {
+      name = "tag:Access"
+      values = ["PRIVATE"]
+    }
+/*
   vpc_id = var.vpc_id
   tags = {
     Access = "PRIVATE"
   }
+*/
 }
 
 ## Create S3 bucket for Access logs
@@ -96,7 +102,7 @@ resource "aws_lb" "ecs_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [data.aws_security_group.public_sg.id]
-  subnets            = [data.aws_subnet_ids.public_subnets.ids]
+  subnets            = [data.aws_subnets.public_subnets.ids]
 
   enable_deletion_protection = false
 

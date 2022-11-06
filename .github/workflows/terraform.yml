@@ -44,9 +44,9 @@ jobs:
       run: terraform init
 
     # Generates an execution plan for Terraform
-    - name: Terraform Plan
-      id: plan
-      run: terraform plan -input=false
+    #- name: Terraform Plan
+    #  id: plan
+    #  run: terraform plan -input=false
 
     # On push to "main", build or change infrastructure according to Terraform configuration files
     #- name: Terraform Apply

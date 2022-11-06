@@ -141,8 +141,8 @@ resource "aws_ecs_cluster" "project_cluster" {
 }
 
 # 07. Task definitions to use in Service
-resource "aws_ecs_task_definition" "service" {
-  family = "project_service"
+resource "aws_ecs_task_definition" "project_task" {
+  family = "project_task"
   execution_role_arn = aws_iam_role.ecs_role.arn
   container_definitions = jsonencode([
     {
@@ -170,8 +170,8 @@ resource "aws_ecs_task_definition" "service" {
 }
 
 # 08. Service configuration
-resource "aws_ecs_service" "node_app" {
-  name            = "node_app"
+resource "aws_ecs_service" "service_node_app" {
+  name            = "service_node_app"
   cluster         = aws_ecs_cluster.project_cluster.id
   task_definition = aws_ecs_task_definition.service.arn
   desired_count   = 3

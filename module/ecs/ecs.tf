@@ -149,7 +149,7 @@ resource "aws_lb_listener" "alb_to_tg" {
 ## Create EC2 Launch Configuration
 resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   image_id = "ami-09d3b3274b6c5d4aa"
-  iam_instance_profile = iam_instance_profile.ecs_agent_pofile.name
+  iam_instance_profile = aws_iam_instance_profile.ecs_agent_pofile.name
   security_groups = [data.aws_security_group.public_sg.id]
   user_data = "#!/bin/bash\necho ECS_CLUSTER=project_cluster >> /etc/ecs/ecs.config"
   instance_type = "t2.micro"

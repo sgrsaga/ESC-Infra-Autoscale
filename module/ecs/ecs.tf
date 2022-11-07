@@ -1,5 +1,5 @@
 ########## Create dependancy service for ECS Cluster service
-#  Application Load balancer
+
 ## Get Public Security Group to apply for the Database
 data "aws_security_group" "public_sg" {
   tags = {
@@ -15,7 +15,28 @@ data "aws_subnets" "public_subnets" {
     }
 }
 
+############## Use available roles to link to user or service
+data "aws_iam_role" "role_ecsServiceRole" {
+  name = "ecsServiceRole"
+}
+data "aws_iam_role" "role_ecsTaskExecutionRole" {
+  name = "ecsTaskExecutionRole"
+}
+data "aws_iam_role" "role_ecsAutoscaleRole" {
+  name = "ecsAutoscaleRole"
+}
+data "aws_iam_role" "role_ecsInstanceRole" {
+  name = "ecsInstanceRole"
+}
 
+# Create Instance Profile for ECS EC2 instances to use in Launch Configuration
+resource "aws_iam_instance_profile" "ecs_agent_profile" {
+  name = "ecs-agent"
+  role = data.aws_iam_role.role_ecsInstanceRole.name
+}
+
+
+# Create Application Load balancer
 resource "aws_lb" "ecs_lb" {
   name               = "ecs-lb"
   internal           = false
@@ -26,7 +47,7 @@ resource "aws_lb" "ecs_lb" {
 
   enable_deletion_protection = false
   tags = {
-    Environment = "Test"
+    Environment = "Project"
   }
 }
 
@@ -57,74 +78,7 @@ resource "aws_lb_listener" "alb_to_tg" {
   }
 }
 
-################# Role for Launch Config ##################
-/*
-resource "aws_iam_role" "ecs_agent" {
-  name               = "ecs-agent"
-  assume_role_policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "ec2.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        }
-    ]
-}
-  EOF
-}
-resource "aws_iam_policy" "ecs_ec2_policy" {
-  name        = "test-policy"
-  description = "A test policy"
-
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:DescribeTags",
-                "ecs:CreateCluster",
-                "ecs:DeregisterContainerInstance",
-                "ecs:DiscoverPollEndpoint",
-                "ecs:Poll",
-                "ecs:RegisterContainerInstance",
-                "ecs:StartTelemetrySession",
-                "ecs:UpdateContainerInstancesState",
-                "ecs:Submit*",
-                "ecr:GetAuthorizationToken",
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents"
-            ],
-            "Resource": "*"
-        }
-    ]
-}
-EOF
-}
-resource "aws_iam_role_policy_attachment" "policy-attach" {
-  role       = aws_iam_role.ecs_agent.name
-  policy_arn = aws_iam_policy.ecs_ec2_policy.arn
-}
-*/
-
-resource "aws_iam_instance_profile" "ecs_agent_profile" {
-  name = "ecs-agent"
-  role = data.aws_iam_role.role_ecsInstanceRole.name
-}
-
-###########################################################
-
-
-## Create EC2 Launch Configuration
+## Create EC2 Launch Configuration for the AutoScaling Group
 resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   image_id = "ami-03dbf0c122cb6cf1d"
   iam_instance_profile = aws_iam_instance_profile.ecs_agent_profile.name
@@ -159,21 +113,6 @@ resource "aws_autoscaling_group" "ecs_ec2_autosacaling_group" {
     aws_launch_configuration.ecs_ec2_launch_config
   ]
 }
-
-############## Use available roles
-data "aws_iam_role" "role_ecsServiceRole" {
-  name = "ecsServiceRole"
-}
-data "aws_iam_role" "role_ecsTaskExecutionRole" {
-  name = "ecsTaskExecutionRole"
-}
-data "aws_iam_role" "role_ecsAutoscaleRole" {
-  name = "ecsAutoscaleRole"
-}
-data "aws_iam_role" "role_ecsInstanceRole" {
-  name = "ecsInstanceRole"
-}
-
 
 # Create ECR repository for the image to store
 resource "aws_ecr_repository" "project_repo" {
@@ -225,7 +164,7 @@ resource "aws_ecs_task_definition" "project_task" {
   ]
 }
 
-# Service configuration
+# ECS Service configuration - This block maintain the link between all services.
 resource "aws_ecs_service" "service_node_app" {
   name            = "service_node_app"
   cluster         = aws_ecs_cluster.project_cluster.id
@@ -250,7 +189,7 @@ resource "aws_ecs_service" "service_node_app" {
   }
 }
 
-# Autoscaling for ECS Service
+# Autoscaling for ECS Service instances
 resource "aws_appautoscaling_target" "ecs_target" {
   max_capacity       = 6
   min_capacity       = 2
@@ -259,7 +198,7 @@ resource "aws_appautoscaling_target" "ecs_target" {
   service_namespace  = "ecs"
 }
 
-# Autoscaling policy
+# Autoscaling policy - If the CPU level above 70% it will scale up.
 resource "aws_appautoscaling_policy" "ecs_policy" {
   name               = "scale_in_out"
   policy_type        = "TargetTrackingScaling"

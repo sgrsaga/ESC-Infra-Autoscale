@@ -1,7 +1,7 @@
 ########## Create dependancy service for ECS Cluster service
 # 01. ECS ecsTaskExecutionRole
 # 02. ECS ecsServiceRole
-
+/*
 ## Create a Monitoring role
 resource "aws_iam_role" "ecs_role" {
   name = "ecs_role"
@@ -131,6 +131,7 @@ resource "aws_iam_instance_profile" "ecs_agent_pofile" {
   name = "ecs_agent_pofile"
   role = aws_iam_role.asg_ec2_role.name
 }
+*/
 
 #  Application Load balancer
 ## Get Public Security Group to apply for the Database
@@ -242,7 +243,7 @@ resource "aws_iam_policy" "ecs_ec2_policy" {
 }
 EOF
 }
-resource "aws_iam_role_policy_attachment" "test-attach" {
+resource "aws_iam_role_policy_attachment" "policy-attach" {
   role       = aws_iam_role.ecs_agent.name
   policy_arn = aws_iam_policy.ecs_ec2_policy.arn
 }
@@ -280,9 +281,6 @@ resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   lifecycle {
     create_before_destroy = true
   }
-  depends_on = [
-    aws_iam_instance_profile.ecs_agent_profile
-  ]
   /*
   user_data = <<EOF
   #!/bin/bash

@@ -44,7 +44,7 @@ module "main_network" {
   public_rt = var.public_rt
   private_rt = var.private_rt
 }
-
+/*
 ## 3. Call Databse creation module
 module "pg_database" {
   source = "./module/rds"
@@ -53,6 +53,7 @@ module "pg_database" {
   db_name = var.db_name
   depends_on = [module.main_network] 
 }
+*/
 
 ## 4. Call ECS creation module
 module "ecs_cluster" {

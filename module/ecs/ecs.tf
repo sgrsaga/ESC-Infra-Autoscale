@@ -78,6 +78,55 @@ resource "aws_lb_listener" "alb_to_tg" {
   }
 }
 
+# Create ECR repository for the image to store
+resource "aws_ecr_repository" "project_repo" {
+  name = "project_repo_aws"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+# Create ECS Cluster
+resource "aws_ecs_cluster" "project_cluster" {
+  name = "project_cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+}
+
+# Task definitions to use in Service
+resource "aws_ecs_task_definition" "project_task" {
+  family = "project_task"
+  execution_role_arn = data.aws_iam_role.role_ecsTaskExecutionRole.arn
+  container_definitions = jsonencode([
+    {
+      name      = "AppTask"
+      image     = aws_ecr_repository.project_repo.repository_url
+      cpu       = 200
+      memory    = 300
+      essential = true
+      portMappings = [
+        {
+          containerPort = 80
+          hostPort      = 8000
+        }
+      ]
+    }
+  ])
+
+  volume {
+    name      = "service-storage"
+    host_path = "/ecs/service-storage"
+  }
+  depends_on = [
+    aws_ecr_repository.project_repo
+  ]
+}
+
 ## Create EC2 Launch Configuration for the AutoScaling Group
 resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   image_id = "ami-03dbf0c122cb6cf1d"
@@ -114,55 +163,27 @@ resource "aws_autoscaling_group" "ecs_ec2_autosacaling_group" {
   ]
 }
 
-# Create ECR repository for the image to store
-resource "aws_ecr_repository" "project_repo" {
-  name                 = "project_repo_aws"
-  image_tag_mutability = "MUTABLE"
+## Auto Scaling plan
+resource "aws_autoscalingplans_scaling_plan" "ec2_scaling_plan" {
+  name = "ec2_scaling_plan"
 
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-}
+  scaling_instruction {
+    max_capacity       = 15
+    min_capacity       = 2
+    resource_id        = format("autoScalingGroup/%s", aws_autoscaling_group.ecs_ec2_autosacaling_group.name)
+    scalable_dimension = "autoscaling:autoScalingGroup:DesiredCapacity"
+    service_namespace  = "autoscaling"
 
-# Create ECS Cluster
-resource "aws_ecs_cluster" "project_cluster" {
-  name = "project_cluster"
+    target_tracking_configuration {
+      predefined_scaling_metric_specification {
+        predefined_scaling_metric_type = "ASGAverageCPUUtilization"
+      }
 
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
-  }
-}
-
-
-# Task definitions to use in Service
-resource "aws_ecs_task_definition" "project_task" {
-  family = "project_task"
-  execution_role_arn = data.aws_iam_role.role_ecsTaskExecutionRole.arn
-  container_definitions = jsonencode([
-    {
-      name      = "AppTask"
-      image     = aws_ecr_repository.project_repo.repository_url
-      cpu       = 200
-      memory    = 300
-      essential = true
-      portMappings = [
-        {
-          containerPort = 80
-          hostPort      = 8000
-        }
-      ]
+      target_value = 70
     }
-  ])
-
-  volume {
-    name      = "service-storage"
-    host_path = "/ecs/service-storage"
   }
-  depends_on = [
-    aws_ecr_repository.project_repo
-  ]
 }
+
 
 # ECS Service configuration - This block maintain the link between all services.
 resource "aws_ecs_service" "service_node_app" {

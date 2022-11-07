@@ -1,138 +1,4 @@
 ########## Create dependancy service for ECS Cluster service
-# 01. ECS ecsTaskExecutionRole
-# 02. ECS ecsServiceRole
-/*
-## Create a Monitoring role
-resource "aws_iam_role" "ecs_role" {
-  name = "ecs_role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = [
-            "ecs.amazonaws.com",
-            "ecs-tasks.amazonaws.com",
-            "application-autoscaling.amazonaws.com"
-          ]
-        }
-      },
-    ]
-  })
-}
-
-## Creating policy
-resource "aws_iam_role_policy" "ecs_policy" {
-  name = "ecs_policy"
-  role = aws_iam_role.ecs_role.id
-
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
-  policy = jsonencode({
-	Version: "2012-10-17",
-	Statement: [
-		{
-			Sid: "manual",
-			Effect: "Allow",
-			Action: [
-                "ecr:GetAuthorizationToken",
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-                "ec2:AuthorizeSecurityGroupIngress",
-                "ec2:Describe*",
-                "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-                "elasticloadbalancing:DeregisterTargets",
-                "elasticloadbalancing:Describe*",
-                "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-                "elasticloadbalancing:RegisterTargets",
-                "ecs:DescribeServices",
-                "ecs:UpdateService",
-                "cloudwatch:DescribeAlarms",
-                "cloudwatch:PutMetricAlarm"
-			],
-			Resource: "*"
-		}
-	]
-})
-  depends_on = [
-    aws_iam_role.ecs_role
-  ]
-}
-
-## Create Role for EC2 launch configuration
-resource "aws_iam_role" "asg_ec2_role" {
-  name = "asg_ec2_role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = [
-            "ec2.amazonaws.com"
-          ]
-        }
-      },
-    ]
-  })
-}
-
-## Creating policy for ASG role
-resource "aws_iam_role_policy" "ec2_asg_policy" {
-  name = "ec2_asg_policy"
-  role = aws_iam_role.asg_ec2_role.id
-
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
-  policy = jsonencode({
-	Version: "2012-10-17",
-	Statement: [
-		{
-			Sid: "manual",
-			Effect: "Allow",
-			Action: [
-                "ec2:DescribeTags",
-                "ecs:CreateCluster",
-                "ecs:DeregisterContainerInstance",
-                "ecs:DiscoverPollEndpoint",
-                "ecs:Poll",
-                "ecs:RegisterContainerInstance",
-                "ecs:StartTelemetrySession",
-                "ecs:UpdateContainerInstancesState",
-                "ecs:Submit*",
-                "ecr:GetAuthorizationToken",
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents"
-			],
-			Resource: "*"
-		}
-	]
-})
-  depends_on = [
-    aws_iam_role.asg_ec2_role
-  ]
-}
-
-# Create Instance profile
-resource "aws_iam_instance_profile" "ecs_agent_pofile" {
-  name = "ecs_agent_pofile"
-  role = aws_iam_role.asg_ec2_role.name
-}
-*/
-
 #  Application Load balancer
 ## Get Public Security Group to apply for the Database
 data "aws_security_group" "public_sg" {
@@ -159,13 +25,6 @@ resource "aws_lb" "ecs_lb" {
   ip_address_type = "ipv4"
 
   enable_deletion_protection = false
-  /*
-  access_logs {
-    bucket  = aws_s3_bucket.alb_access_log_s3.bucket
-    prefix  = "alb-access-log"
-    enabled = true
-  }
-  */
   tags = {
     Environment = "Test"
   }
@@ -247,21 +106,6 @@ resource "aws_iam_role_policy_attachment" "policy-attach" {
   role       = aws_iam_role.ecs_agent.name
   policy_arn = aws_iam_policy.ecs_ec2_policy.arn
 }
-/*
-data "aws_iam_policy_document" "ecs_agent" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-  }
-}
-resource "aws_iam_role_policy_attachment" "ecs_agent" {
-  role       = "aws_iam_role.ecs_agent.name"
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
-}
-*/
 
 resource "aws_iam_instance_profile" "ecs_agent_profile" {
   name = "ecs-agent"
@@ -281,7 +125,6 @@ resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   lifecycle {
     create_before_destroy = true
   }
-  /*
   user_data = <<EOF
   #!/bin/bash
   sudo yum update -y
@@ -294,7 +137,6 @@ resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   sudo echo ECS_CLUSTER=project_cluster >> /etc/ecs/ecs.config
   sudo systemctl restart ecs
   EOF  
-  */
 }
 
 ## Create Autoscaling group
@@ -383,6 +225,7 @@ resource "aws_ecs_service" "service_node_app" {
   task_definition = aws_ecs_task_definition.project_task.arn
   desired_count   = 3
   launch_type = "EC2"
+  health_check_grace_period_seconds = 300
   iam_role        = data.aws_iam_role.role_ecsServiceRole.arn
   depends_on      = [
     aws_ecs_cluster.project_cluster, 
@@ -398,14 +241,6 @@ resource "aws_ecs_service" "service_node_app" {
     container_name   = "AppTask"
     container_port   = 80
   }
-  /*
-  network_configuration {
-    security_groups = [data.aws_security_group.public_sg.id]
-    subnets = data.aws_subnets.public_subnets.ids
-    assign_public_ip = false
-  }
-  */
-  
 }
 
 # Autoscaling for ECS Service

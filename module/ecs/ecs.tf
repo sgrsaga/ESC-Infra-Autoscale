@@ -18,7 +18,6 @@ resource "aws_iam_role" "ecs_role" {
             "ecs.amazonaws.com",
             "ecs-tasks.amazonaws.com",
             "application-autoscaling.amazonaws.com",
-            "ec2.amazonaws.com"
           ]
         }
       },

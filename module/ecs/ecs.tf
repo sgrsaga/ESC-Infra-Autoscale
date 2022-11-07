@@ -193,6 +193,7 @@ resource "aws_lb_listener" "alb_to_tg" {
 
 ## Create EC2 Launch Configuration
 resource "aws_launch_configuration" "ecs_ec2_launch_config" {
+  name = "ECS-EC2-Launch-Config"
   image_id = "ami-09d3b3274b6c5d4aa"
   iam_instance_profile = aws_iam_instance_profile.ecs_agent_pofile.name
   security_groups = [data.aws_security_group.public_sg.id]
@@ -203,7 +204,8 @@ resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   sudo amazon-linux-extras disable docker
   sudo amazon-linux-extras install -y ecs
   sudo systemctl enable --now ecs
-  echo ECS_CLUSTER=project_cluster >> /etc/ecs/ecs.config"
+  sudo mkdir -p /etc/ecs/
+  sudo echo ECS_CLUSTER=project_cluster >> /etc/ecs/ecs.config
   EOF  
 }
 

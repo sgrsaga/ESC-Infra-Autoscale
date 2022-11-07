@@ -204,7 +204,6 @@ resource "aws_ecs_service" "service_node_app" {
     aws_ecs_task_definition.project_task,
     aws_lb_listener.alb_to_tg
     ]
-  
   lifecycle {
     ignore_changes = [desired_count]
   }

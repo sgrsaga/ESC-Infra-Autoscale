@@ -166,7 +166,12 @@ resource "aws_autoscaling_group" "ecs_ec2_autosacaling_group" {
 ## Auto Scaling plan
 resource "aws_autoscalingplans_scaling_plan" "ec2_scaling_plan" {
   name = "ec2_scaling_plan"
-
+  application_source {
+    tag_filter {
+      key    = "Project"
+      values = ["ScalingEC2s"]
+    }
+  }
   scaling_instruction {
     max_capacity       = 15
     min_capacity       = 2

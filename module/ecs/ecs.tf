@@ -17,7 +17,7 @@ resource "aws_iam_role" "ecs_role" {
           Service = [
             "ecs.amazonaws.com",
             "ecs-tasks.amazonaws.com",
-            "application-autoscaling.amazonaws.com",
+            "application-autoscaling.amazonaws.com"
           ]
         }
       },

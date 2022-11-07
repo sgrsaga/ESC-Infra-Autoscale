@@ -303,11 +303,13 @@ resource "aws_ecs_service" "service_node_app" {
     container_name   = "AppTask"
     container_port   = 80
   }
+  /*
   network_configuration {
     security_groups = [data.aws_security_group.public_sg.id]
     subnets = data.aws_subnets.public_subnets.ids
     assign_public_ip = false
   }
+  */
   
 }
 

@@ -223,11 +223,13 @@ resource "aws_iam_instance_profile" "ecs_agent" {
 ## Create EC2 Launch Configuration
 resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   name = "ECS-EC2-Launch-Config"
-  name_prefix = "ECS-EC2"
   image_id = "ami-03dbf0c122cb6cf1d"
   iam_instance_profile = aws_iam_instance_profile.ecs_agent.name
   security_groups = [data.aws_security_group.public_sg.id]
   instance_type = "t2.micro"
+  lifecycle {
+    create_before_destroy = true
+  }
   /*
   user_data = <<EOF
   #!/bin/bash

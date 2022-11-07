@@ -117,7 +117,6 @@ resource "aws_iam_instance_profile" "ecs_agent_profile" {
 
 ## Create EC2 Launch Configuration
 resource "aws_launch_configuration" "ecs_ec2_launch_config" {
-  name = "ECS-EC2-Launch-Config"
   image_id = "ami-03dbf0c122cb6cf1d"
   iam_instance_profile = aws_iam_instance_profile.ecs_agent_profile.name
   security_groups = [data.aws_security_group.public_sg.id]

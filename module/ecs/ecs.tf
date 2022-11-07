@@ -89,7 +89,7 @@ resource "aws_lb" "ecs_lb" {
   load_balancer_type = "application"
   security_groups    = [data.aws_security_group.public_sg.id]
   subnets            = data.aws_subnets.public_subnets.ids
-  ip_address_type = "dualstack"
+  ip_address_type = "ipv4"
 
   enable_deletion_protection = false
   /*

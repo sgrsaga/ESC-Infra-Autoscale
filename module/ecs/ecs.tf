@@ -130,8 +130,9 @@ resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   }
   user_data = <<EOF
   #!/bin/bash
-  mkdir -p /etc/ecs/
-  echo ECS_CLUSTER=project_cluster >> /etc/ecs/ecs.config
+  cat <<'EOF' >> /etc/ecs/ecs.config
+  ECS_CLUSTER=project_cluster
+  ECS_CONTAINER_INSTANCE_PROPAGATE_TAGS_FROM=ec2_instance
   EOF  
 }
 

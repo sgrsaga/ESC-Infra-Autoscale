@@ -217,5 +217,7 @@ resource "aws_appautoscaling_policy" "ecs_policy" {
     }
 
     target_value = 70
+    scale_out_cooldown = 120
+    scale_in_cooldown = 120
   }
 }

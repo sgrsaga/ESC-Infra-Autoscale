@@ -16,7 +16,8 @@ resource "aws_iam_role" "ecs_role" {
         Principal = {
           Service = [
             "ecs.amazonaws.com",
-            "ecs-tasks.amazonaws.com"
+            "ecs-tasks.amazonaws.com",
+            "application-autoscaling.amazonaws.com"
           ]
         }
       },
@@ -50,7 +51,11 @@ resource "aws_iam_role_policy" "ecs_policy" {
                 "elasticloadbalancing:DeregisterTargets",
                 "elasticloadbalancing:Describe*",
                 "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-                "elasticloadbalancing:RegisterTargets"
+                "elasticloadbalancing:RegisterTargets",
+                "ecs:DescribeServices",
+                "ecs:UpdateService",
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:PutMetricAlarm"
 			],
 			Resource: "*"
 		}
@@ -84,6 +89,7 @@ resource "aws_lb" "ecs_lb" {
   load_balancer_type = "application"
   security_groups    = [data.aws_security_group.public_sg.id]
   subnets            = data.aws_subnets.public_subnets.ids
+  ip_address_type = "dualstack"
 
   enable_deletion_protection = false
   /*
@@ -177,7 +183,9 @@ resource "aws_ecs_service" "service_node_app" {
   iam_role        = aws_iam_role.ecs_role.arn
   depends_on      = [aws_iam_role_policy.ecs_policy, aws_ecs_cluster.project_cluster, aws_ecs_task_definition.project_task]
   
-
+  lifecycle {
+    ignore_changes = [desired_count]
+  }
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_alb_tg.arn
     container_name   = "AppTask"
@@ -186,3 +194,28 @@ resource "aws_ecs_service" "service_node_app" {
   
 }
 
+# Autoscaling for ECS Service
+resource "aws_appautoscaling_target" "ecs_target" {
+  max_capacity       = 6
+  min_capacity       = 2
+  resource_id        = "service/${aws_ecs_cluster.project_cluster.name}/${aws_ecs_service.service_node_app.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+# Autoscaling policy
+resource "aws_appautoscaling_policy" "ecs_policy" {
+  name               = "scale-down"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+
+    target_value = 70
+  }
+}

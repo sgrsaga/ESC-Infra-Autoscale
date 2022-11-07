@@ -61,6 +61,7 @@ module "ecs_cluster" {
   depends_on = [module.main_network] 
 }
 
+/*
 ## 4.1 Call ECS service autoscaling module
 module "ecs-service-autoscaling" {
   source  = "cn-terraform/ecs-service-autoscaling/aws"
@@ -71,3 +72,4 @@ module "ecs-service-autoscaling" {
   # insert the 3 required variables here
   depends_on = [module.ecs_cluster]
 }
+*/

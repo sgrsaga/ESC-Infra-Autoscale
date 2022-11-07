@@ -281,7 +281,7 @@ resource "aws_launch_configuration" "ecs_ec2_launch_config" {
     create_before_destroy = true
   }
   depends_on = [
-    aws_iam_instance_profile.ecs_agent
+    aws_iam_instance_profile.ecs_agent_profile
   ]
   /*
   user_data = <<EOF

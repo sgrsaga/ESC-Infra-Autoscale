@@ -194,9 +194,10 @@ resource "aws_lb_listener" "alb_to_tg" {
 resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   name = "ECS-EC2-Launch-Config"
   image_id = "ami-03dbf0c122cb6cf1d"
-  iam_instance_profile = aws_iam_instance_profile.ecs_agent_pofile.name
+  #iam_instance_profile = aws_iam_instance_profile.ecs_agent_pofile.name
   security_groups = [data.aws_security_group.public_sg.id]
   instance_type = "t2.micro"
+  /*
   user_data = <<EOF
   #!/bin/bash
   sudo yum update -y
@@ -209,6 +210,7 @@ resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   sudo echo ECS_CLUSTER=project_cluster >> /etc/ecs/ecs.config
   sudo systemctl restart ecs
   EOF  
+  */
 }
 
 ## Create Autoscaling group

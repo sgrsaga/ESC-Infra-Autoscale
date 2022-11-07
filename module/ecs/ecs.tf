@@ -17,7 +17,8 @@ resource "aws_iam_role" "ecs_role" {
           Service = [
             "ecs.amazonaws.com",
             "ecs-tasks.amazonaws.com",
-            "application-autoscaling.amazonaws.com"
+            "application-autoscaling.amazonaws.com",
+            "ec2.amazonaws.com"
           ]
         }
       },
@@ -55,7 +56,22 @@ resource "aws_iam_role_policy" "ecs_policy" {
                 "ecs:DescribeServices",
                 "ecs:UpdateService",
                 "cloudwatch:DescribeAlarms",
-                "cloudwatch:PutMetricAlarm"
+                "cloudwatch:PutMetricAlarm",
+                "ec2:DescribeTags",
+                "ecs:CreateCluster",
+                "ecs:DeregisterContainerInstance",
+                "ecs:DiscoverPollEndpoint",
+                "ecs:Poll",
+                "ecs:RegisterContainerInstance",
+                "ecs:StartTelemetrySession",
+                "ecs:UpdateContainerInstancesState",
+                "ecs:Submit*",
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
 			],
 			Resource: "*"
 		}
@@ -66,7 +82,7 @@ resource "aws_iam_role_policy" "ecs_policy" {
   ]
 }
 
-# 03. Application Load balancer
+#  Application Load balancer
 ## Get Public Security Group to apply for the Database
 data "aws_security_group" "public_sg" {
   tags = {
@@ -104,7 +120,7 @@ resource "aws_lb" "ecs_lb" {
   }
 }
 
-# 04. Target Group for ALB
+# Target Group for ALB
 resource "aws_lb_target_group" "ecs_alb_tg" {
   name     = "ecs-alb-tg"
   target_type = "instance"
@@ -124,7 +140,7 @@ resource "aws_lb_listener" "alb_to_tg" {
   }
 }
 
-# 05. Create ECR repository for the image to store
+# Create ECR repository for the image to store
 resource "aws_ecr_repository" "project_repo" {
   name                 = "project_repo_aws"
   image_tag_mutability = "MUTABLE"
@@ -134,7 +150,7 @@ resource "aws_ecr_repository" "project_repo" {
   }
 }
 
-# 06. Create ECS Cluster
+# Create ECS Cluster
 resource "aws_ecs_cluster" "project_cluster" {
   name = "project_cluster"
 
@@ -145,7 +161,7 @@ resource "aws_ecs_cluster" "project_cluster" {
 }
 
 
-# 07. Task definitions to use in Service
+# Task definitions to use in Service
 resource "aws_ecs_task_definition" "project_task" {
   family = "project_task"
   execution_role_arn = aws_iam_role.ecs_role.arn
@@ -174,14 +190,20 @@ resource "aws_ecs_task_definition" "project_task" {
   ]
 }
 
-# 08. Service configuration
+# Service configuration
 resource "aws_ecs_service" "service_node_app" {
   name            = "service_node_app"
   cluster         = aws_ecs_cluster.project_cluster.id
   task_definition = aws_ecs_task_definition.project_task.arn
   desired_count   = 3
+  launch_type = "EC2"
   iam_role        = aws_iam_role.ecs_role.arn
-  depends_on      = [aws_iam_role_policy.ecs_policy, aws_ecs_cluster.project_cluster, aws_ecs_task_definition.project_task]
+  depends_on      = [
+    aws_iam_role_policy.ecs_policy, 
+    aws_ecs_cluster.project_cluster, 
+    aws_ecs_task_definition.project_task,
+    aws_lb_listener.alb_to_tg
+    ]
   
   lifecycle {
     ignore_changes = [desired_count]
@@ -190,6 +212,11 @@ resource "aws_ecs_service" "service_node_app" {
     target_group_arn = aws_lb_target_group.ecs_alb_tg.arn
     container_name   = "AppTask"
     container_port   = 80
+  }
+  network_configuration {
+    security_groups = [data.aws_security_group.public_sg.id]
+    subnets = data.aws_subnets.public_subnets.ids
+    assign_public_ip = false
   }
   
 }

@@ -82,6 +82,12 @@ resource "aws_iam_role_policy" "ecs_policy" {
   ]
 }
 
+# Create Instance profile
+resource "aws_iam_instance_profile" "ecs_agent_pofile" {
+  name = "ecs-agent"
+  role = aws_iam_role.ecs_role.name
+}
+
 #  Application Load balancer
 ## Get Public Security Group to apply for the Database
 data "aws_security_group" "public_sg" {
@@ -139,6 +145,31 @@ resource "aws_lb_listener" "alb_to_tg" {
     type = "forward"
   }
 }
+
+## Create EC2 Launch Configuration
+resource "aws_launch_configuration" "ecs_ec2_launch_config" {
+  image_id = "ami-09d3b3274b6c5d4aa"
+  iam_instance_profile = iam_instance_profile.ecs_agent_pofile.name
+  security_groups = [data.aws_security_group.public_sg.id]
+  user_data = "#!/bin/bash\necho ECS_CLUSTER=project_cluster >> /etc/ecs/ecs.config"
+  instance_type = "t2.micro"
+  
+}
+
+## Create Autoscaling group
+resource "aws_autoscaling_group" "ecs_ec2_autosacaling_group" {
+  name = "ecs-ec2-asg"
+  vpc_zone_identifier = data.aws_subnets.public_subnets.ids
+  launch_configuration = aws_launch_configuration.ecs_ec2_launch_config.name
+
+  desired_capacity = 6
+  min_size = 6
+  max_size = 12
+  health_check_grace_period = 120
+  health_check_type = "EC2"
+  
+}
+
 
 # Create ECR repository for the image to store
 resource "aws_ecr_repository" "project_repo" {

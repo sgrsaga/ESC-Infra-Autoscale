@@ -56,7 +56,52 @@ resource "aws_iam_role_policy" "ecs_policy" {
                 "ecs:DescribeServices",
                 "ecs:UpdateService",
                 "cloudwatch:DescribeAlarms",
-                "cloudwatch:PutMetricAlarm",
+                "cloudwatch:PutMetricAlarm"
+			],
+			Resource: "*"
+		}
+	]
+})
+  depends_on = [
+    aws_iam_role.ecs_role
+  ]
+}
+
+## Create Role for EC2 launch configuration
+resource "aws_iam_role" "asg_ec2_role" {
+  name = "asg_ec2_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = [
+            "ec2.amazonaws.com"
+          ]
+        }
+      },
+    ]
+  })
+}
+
+## Creating policy for ASG role
+resource "aws_iam_role_policy" "ec2_asg_policy" {
+  name = "ec2_asg_policy"
+  role = aws_iam_role.asg_ec2_role.id
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+	Version: "2012-10-17",
+	Statement: [
+		{
+			Sid: "manual",
+			Effect: "Allow",
+			Action: [
                 "ec2:DescribeTags",
                 "ecs:CreateCluster",
                 "ecs:DeregisterContainerInstance",
@@ -78,14 +123,14 @@ resource "aws_iam_role_policy" "ecs_policy" {
 	]
 })
   depends_on = [
-    aws_iam_role.ecs_role
+    aws_iam_role.asg_ec2_role
   ]
 }
 
 # Create Instance profile
 resource "aws_iam_instance_profile" "ecs_agent_pofile" {
-  name = "ecs-agent"
-  role = aws_iam_role.ecs_role.name
+  name = "ecs_agent_pofile"
+  role = aws_iam_role.asg_ec2_role.name
 }
 
 #  Application Load balancer

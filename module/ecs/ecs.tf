@@ -238,9 +238,6 @@ data "aws_iam_role" "role_ecsTaskExecutionRole" {
 data "aws_iam_role" "role_ecsAutoscaleRole" {
   name = "ecsAutoscaleRole"
 }
-data "aws_iam_role" "role_AmazonEC2ContainerServiceforEC2Role" {
-  name = "AmazonEC2ContainerServiceforEC2Role"
-}
 
 
 # Create ECR repository for the image to store

@@ -59,7 +59,6 @@ module "ecs_cluster" {
   source = "./module/ecs"
   vpc_id = module.main_network.vpc_id
   depends_on = [module.main_network] 
-  iam_instance_profile = var.ecs_role
 }
 
 /*

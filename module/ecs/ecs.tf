@@ -51,6 +51,7 @@ resource "aws_lb_listener" "alb_to_tg" {
 }
 
 ################# Role for Launch Config ##################
+/*
 resource "aws_iam_role" "ecs_agent" {
   name               = "ecs-agent"
   assume_role_policy = <<EOF
@@ -106,10 +107,11 @@ resource "aws_iam_role_policy_attachment" "policy-attach" {
   role       = aws_iam_role.ecs_agent.name
   policy_arn = aws_iam_policy.ecs_ec2_policy.arn
 }
+*/
 
 resource "aws_iam_instance_profile" "ecs_agent_profile" {
   name = "ecs-agent"
-  role = aws_iam_role.ecs_agent.name
+  role = data.aws_iam_role.role_ecsInstanceRole.name
 }
 
 ###########################################################
@@ -121,6 +123,8 @@ resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   iam_instance_profile = aws_iam_instance_profile.ecs_agent_profile.name
   security_groups = [data.aws_security_group.public_sg.id]
   instance_type = "t2.micro"
+  key_name = "EcsKey"
+  associate_public_ip_address = true
   lifecycle {
     create_before_destroy = true
   }
@@ -165,6 +169,9 @@ data "aws_iam_role" "role_ecsTaskExecutionRole" {
 data "aws_iam_role" "role_ecsAutoscaleRole" {
   name = "ecsAutoscaleRole"
 }
+data "aws_iam_role" "role_ecsInstanceRole" {
+  name = "ecsInstanceRole"
+}
 
 
 # Create ECR repository for the image to store
@@ -196,8 +203,8 @@ resource "aws_ecs_task_definition" "project_task" {
     {
       name      = "AppTask"
       image     = aws_ecr_repository.project_repo.repository_url
-      cpu       = 10
-      memory    = 512
+      cpu       = 200
+      memory    = 300
       essential = true
       portMappings = [
         {

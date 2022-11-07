@@ -205,7 +205,7 @@ resource "aws_appautoscaling_target" "ecs_target" {
 
 # Autoscaling policy
 resource "aws_appautoscaling_policy" "ecs_policy" {
-  name               = "scale-down"
+  name               = "scale_in_out"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.ecs_target.resource_id
   scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension

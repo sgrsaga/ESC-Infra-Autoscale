@@ -130,15 +130,8 @@ resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   }
   user_data = <<EOF
   #!/bin/bash
-  sudo yum update -y
-  sudo amazon-linux-extras disable docker
-  sudo amazon-linux-extras install -y ecs
-  sudo systemctl enable ecs
-  sudo mkdir -p /etc/ecs/
-  cd /etc/ecs/
-  sudo chown ec2-user:ec2-user -R ./ecs/
-  sudo echo ECS_CLUSTER=project_cluster >> /etc/ecs/ecs.config
-  sudo systemctl restart ecs
+  mkdir -p /etc/ecs/
+  echo ECS_CLUSTER=project_cluster >> /etc/ecs/ecs.config
   EOF  
 }
 

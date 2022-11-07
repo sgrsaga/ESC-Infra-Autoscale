@@ -287,7 +287,7 @@ resource "aws_ecs_service" "service_node_app" {
   task_definition = aws_ecs_task_definition.project_task.arn
   desired_count   = 3
   launch_type = "EC2"
-  iam_role        = aws_iam_role.ecs_role.arn
+  #iam_role        = aws_iam_role.ecs_role.arn
   depends_on      = [
     aws_iam_role_policy.ecs_policy, 
     aws_ecs_cluster.project_cluster, 

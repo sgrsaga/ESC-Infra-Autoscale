@@ -190,11 +190,41 @@ resource "aws_lb_listener" "alb_to_tg" {
   }
 }
 
+################# Role for Launch Config ##################
+data "aws_iam_policy_document" "ecs_agent" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "ecs_agent" {
+  name               = "ecs-agent"
+  assume_role_policy = data.aws_iam_policy_document.ecs_agent.json
+}
+
+
+resource "aws_iam_role_policy_attachment" "ecs_agent" {
+  role       = "aws_iam_role.ecs_agent.name"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+resource "aws_iam_instance_profile" "ecs_agent" {
+  name = "ecs-agent"
+  role = aws_iam_role.ecs_agent.name
+}
+###########################################################
+
+
 ## Create EC2 Launch Configuration
 resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   name = "ECS-EC2-Launch-Config"
   image_id = "ami-03dbf0c122cb6cf1d"
-  #iam_instance_profile = aws_iam_instance_profile.ecs_agent_pofile.name
+  iam_instance_profile = aws_iam_instance_profile.ecs_agent.name
   security_groups = [data.aws_security_group.public_sg.id]
   instance_type = "t2.micro"
   /*

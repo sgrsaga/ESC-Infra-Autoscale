@@ -193,7 +193,7 @@ resource "aws_lb_listener" "alb_to_tg" {
 ## Create EC2 Launch Configuration
 resource "aws_launch_configuration" "ecs_ec2_launch_config" {
   name = "ECS-EC2-Launch-Config"
-  image_id = "ami-09d3b3274b6c5d4aa"
+  image_id = "ami-03dbf0c122cb6cf1d"
   iam_instance_profile = aws_iam_instance_profile.ecs_agent_pofile.name
   security_groups = [data.aws_security_group.public_sg.id]
   instance_type = "t2.micro"
@@ -228,6 +228,19 @@ resource "aws_autoscaling_group" "ecs_ec2_autosacaling_group" {
   ]
 }
 
+############## Use available roles
+data "aws_iam_role" "role_ecsServiceRole" {
+  name = "ecsServiceRole"
+}
+data "aws_iam_role" "role_ecsTaskExecutionRole" {
+  name = "ecsTaskExecutionRole"
+}
+data "aws_iam_role" "role_ecsAutoscaleRole" {
+  name = "ecsAutoscaleRole"
+}
+data "aws_iam_role" "role_AmazonEC2ContainerServiceforEC2Role" {
+  name = "AmazonEC2ContainerServiceforEC2Role"
+}
 
 
 # Create ECR repository for the image to store
@@ -254,7 +267,7 @@ resource "aws_ecs_cluster" "project_cluster" {
 # Task definitions to use in Service
 resource "aws_ecs_task_definition" "project_task" {
   family = "project_task"
-  execution_role_arn = aws_iam_role.ecs_role.arn
+  execution_role_arn = data.aws_iam_role.role_ecsTaskExecutionRole.arn
   container_definitions = jsonencode([
     {
       name      = "AppTask"
@@ -287,9 +300,8 @@ resource "aws_ecs_service" "service_node_app" {
   task_definition = aws_ecs_task_definition.project_task.arn
   desired_count   = 3
   launch_type = "EC2"
-  #iam_role        = aws_iam_role.ecs_role.arn
+  iam_role        = data.aws_iam_role.role_ecsServiceRole.arn
   depends_on      = [
-    aws_iam_role_policy.ecs_policy, 
     aws_ecs_cluster.project_cluster, 
     aws_ecs_task_definition.project_task,
     aws_lb_listener.alb_to_tg

@@ -10,3 +10,8 @@ variable "ecs_alb_arn" {
 variable "alb_dns_name" {
     type = string  
 }
+
+## AWS ALB ZONE ID
+variable "alb_zone_id" {
+    type = string  
+}

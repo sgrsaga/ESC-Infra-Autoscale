@@ -14,7 +14,7 @@ data "aws_route53_zone" "ideamics_r53z" {
 resource "aws_route53_record" "ideamics_a_record" {
   zone_id = data.aws_route53_zone.ideamics_r53z.zone_id
   name    = "ideamics.com"
-  type    = "A"
+  type    = "CNAME"
   records = [var.alb_dns_name]
   ttl = 60
   allow_overwrite = true

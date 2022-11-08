@@ -51,7 +51,6 @@ resource "aws_lb" "ecs_lb" {
   }
 }
 
-
 # Target Group for ALB
 resource "aws_lb_target_group" "ecs_alb_tg" {
   name     = "ecs-alb-tg"

@@ -35,7 +35,7 @@ resource "aws_acm_certificate_validation" "ideamics_validation" {
 
 # Create new listner to the target group with certificate link
 resource "aws_lb_listener" "front_end" {
-  load_balancer_arn = var.ecs_lb
+  load_balancer_arn = var.ecs_alb_arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"

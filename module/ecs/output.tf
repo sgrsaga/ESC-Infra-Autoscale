@@ -16,10 +16,10 @@ output "ecs_service_name" {
 
 ## Target group will refered in R53 whe adding a new HTTPS listner
 output "lb_target_group" {
-  value = aws_lb_target_group.ecs_alb_tg  
+  value = aws_lb_target_group.ecs_alb_tg.arn
 }
 
 ## Output AWS ALB ARN
-output "ecs_lb" {
+output "ecs_alb" {
   value = aws_lb.ecs_lb.arn
 }

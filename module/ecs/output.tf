@@ -31,5 +31,5 @@ output "ecs_alb_dns" {
 
 # Output AWS ALB Hosted Zoneid for R53 A record usage as alias
 output "ecs_alb_zone_id" {
-  alb_hosted_zone_id = aws_lb.ecs_alb.zone_id
+  value = aws_lb.ecs_lb.zone_id
 }

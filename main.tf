@@ -79,8 +79,8 @@ module "ecs-service-autoscaling" {
 module "route53" {
   source = "./module/r53"
   target_group_arn = module.ecs_cluster.lb_target_group
+  ecs_lb = module.ecs_cluster.ecs_lb
   depends_on = [
     module.ecs_cluster
   ]
-  
 }

@@ -18,3 +18,8 @@ output "ecs_service_name" {
 output "lb_target_group" {
   value = aws_lb_target_group.ecs_alb_tg  
 }
+
+## Output AWS ALB ARN
+output "ecs_lb" {
+  value = aws_lb.ecs_lb.arn
+}

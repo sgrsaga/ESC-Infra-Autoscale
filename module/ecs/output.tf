@@ -23,3 +23,8 @@ output "lb_target_group" {
 output "ecs_alb" {
   value = aws_lb.ecs_lb.arn
 }
+
+## Output AWS ALB DNS name
+output "ecs_alb_dns" {
+  value = aws_lb.ecs_lb.dns_name
+}

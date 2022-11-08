@@ -80,6 +80,7 @@ module "route53" {
   source = "./module/r53"
   target_group_arn = module.ecs_cluster.lb_target_group
   ecs_alb_arn = module.ecs_cluster.ecs_alb
+  alb_dns_name = module.ecs_cluster.ecs_alb_dns
   depends_on = [
     module.ecs_cluster
   ]

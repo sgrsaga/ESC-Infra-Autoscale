@@ -12,3 +12,9 @@ output "ecs_cluster_name" {
 output "ecs_service_name" {
     value = aws_ecs_service.service_node_app.name
 }
+
+
+## Target group will refered in R53 whe adding a new HTTPS listner
+output "lb_target_group" {
+  value = aws_lb_target_group.ecs_alb_tg  
+}

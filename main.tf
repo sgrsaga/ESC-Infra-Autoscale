@@ -74,3 +74,13 @@ module "ecs-service-autoscaling" {
   depends_on = [module.ecs_cluster]
 }
 */
+
+## 4. Route 53 Configuration
+module "route53" {
+  source = "./module/r53"
+  target_group_arn = module.ecs_cluster.lb_target_group
+  depends_on = [
+    module.ecs_cluster
+  ]
+  
+}

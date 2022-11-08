@@ -67,6 +67,7 @@ resource "aws_lb_target_group" "ecs_alb_tg" {
   }
 }
 
+
 # Links ALB to TG with lister rule
 resource "aws_lb_listener" "alb_to_tg" {
   load_balancer_arn = aws_lb.ecs_lb.arn

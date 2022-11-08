@@ -52,6 +52,13 @@ variable "db_pass" {
     type = string
     default = "myDbPass"
 }
+## AWS SecretManager DB Password name prefix
+variable "cm_db_pass_prefix" {
+    type = string
+    default = "postgres-db-password"
+}
+
+
 ## DB Parameter group
 variable "db_para_group_name" {
     type = string

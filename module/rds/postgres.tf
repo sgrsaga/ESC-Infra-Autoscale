@@ -34,9 +34,16 @@ resource "random_password" "db_master_pass"{
   special          = true
   override_special = "_!%^"
 }
+## Create random value as AWS SecretManager Secret name postfix
+resource "random_password" "sm_postfix"{
+  length           = 5
+  special          = true
+  override_special = "_!%^"
+}
+
 ## Create secret in Password manager
 resource "aws_secretsmanager_secret" "db_password" {
-  name = "postgres-db-password"
+  name = "${var.cm_db_pass_prefix}-${random_password.sm_postfix.result}"
 }
 ## Set the secret version with value of the random generator
 resource "aws_secretsmanager_secret_version" "password" {
@@ -127,7 +134,7 @@ resource "aws_db_instance" "postgress_database" {
     engine = var.db_engine
     engine_version = var.db_engine_version
     instance_class = var.db_class
-    name = var.db_name
+    db_name = var.db_name
     username = var.db_username
     password = data.aws_secretsmanager_secret_version.get_password_version.secret_string
     #password = data.aws_secretsmanager_secret_version.password

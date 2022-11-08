@@ -3,6 +3,12 @@ resource "aws_acm_certificate" "ideamics_crt" {
   domain_name       = "ideamics.com"
   validation_method = "DNS"
 }
+## Validate FQDN
+resource "aws_acm_certificate_validation" "ideamics_validation" {
+  certificate_arn         = aws_acm_certificate.ideamics_crt.arn
+  validation_record_fqdns = [for record in aws_route53_record.ideamics_record : record.fqdn]
+}
+
 
 ## Get Route 53 zone details
 data "aws_route53_zone" "ideamics_r53z" {
@@ -21,13 +27,13 @@ resource "aws_route53_record" "ideamics_a_record" {
     evaluate_target_health = true
   }
 }
-
+## Create record in Hosted zone for all FQDNs
 resource "aws_route53_record" "ideamics_record" {
   for_each = {
-    for dvo in aws_acm_certificate.ideamics_crt.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
+    for domin_valid in aws_acm_certificate.ideamics_crt.domain_validation_options : domin_valid.domain_name => {
+      name   = domin_valid.resource_record_name
+      record = domin_valid.resource_record_value
+      type   = domin_valid.resource_record_type
     }
   }
 
@@ -37,12 +43,6 @@ resource "aws_route53_record" "ideamics_record" {
   ttl             = 60
   type            = each.value.type
   zone_id         = data.aws_route53_zone.ideamics_r53z.zone_id
-}
-
-
-resource "aws_acm_certificate_validation" "ideamics_validation" {
-  certificate_arn         = aws_acm_certificate.ideamics_crt.arn
-  validation_record_fqdns = [for record in aws_route53_record.ideamics_record : record.fqdn]
 }
 
 # Create new listner to the target group with certificate link

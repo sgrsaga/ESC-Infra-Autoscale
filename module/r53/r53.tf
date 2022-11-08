@@ -11,7 +11,7 @@ data "aws_route53_zone" "ideamics_r53z" {
 }
 
 ## Create record in hosted zone 
-resource "aws_route53_record" "ideamics_record" {
+resource "aws_route53_record" "ideamics_a_record" {
   zone_id = data.aws_route53_zone.ideamics_r53z.zone_id
   name    = "ideamics.com"
   type    = "A"
@@ -20,7 +20,6 @@ resource "aws_route53_record" "ideamics_record" {
   allow_overwrite = true
 }
 
-/*
 resource "aws_route53_record" "ideamics_record" {
   for_each = {
     for dvo in aws_acm_certificate.ideamics_crt.domain_validation_options : dvo.domain_name => {
@@ -37,7 +36,7 @@ resource "aws_route53_record" "ideamics_record" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.ideamics_r53z.zone_id
 }
-*/
+
 
 resource "aws_acm_certificate_validation" "ideamics_validation" {
   certificate_arn         = aws_acm_certificate.ideamics_crt.arn

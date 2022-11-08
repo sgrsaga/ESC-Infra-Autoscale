@@ -53,7 +53,7 @@ resource "aws_secretsmanager_secret_version" "password" {
 
 ## Get the password by name
 data "aws_secretsmanager_secret" "get_db_password" {
-  name = "postgres-db-password"
+  name = aws_secretsmanager_secret.db_password.name
   depends_on = [
     aws_secretsmanager_secret.db_password,
     aws_secretsmanager_secret_version.password

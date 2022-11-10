@@ -237,9 +237,9 @@ resource "aws_autoscaling_group" "ecs_ec2_autosacaling_group" {
   vpc_zone_identifier = data.aws_subnets.public_subnets.ids
   launch_configuration = aws_launch_configuration.ecs_ec2_launch_config.name
 
-  desired_capacity = 6
-  min_size = 6
-  max_size = 12
+  desired_capacity = 1
+  min_size = 1
+  max_size = 6
   health_check_grace_period = 300
   health_check_type = "EC2"
   
@@ -259,7 +259,7 @@ resource "aws_autoscalingplans_scaling_plan" "ec2_scaling_plan" {
   }
   scaling_instruction {
     max_capacity       = 15
-    min_capacity       = 2
+    min_capacity       = 1
     resource_id        = format("autoScalingGroup/%s", aws_autoscaling_group.ecs_ec2_autosacaling_group.name)
     scalable_dimension = "autoscaling:autoScalingGroup:DesiredCapacity"
     service_namespace  = "autoscaling"
@@ -268,7 +268,7 @@ resource "aws_autoscalingplans_scaling_plan" "ec2_scaling_plan" {
       predefined_scaling_metric_specification {
         predefined_scaling_metric_type = "ASGAverageCPUUtilization"
       }
-      target_value = 70
+      target_value = 1 # Target value is reduced to demonstrate scaling
     }
   }
 }
@@ -278,7 +278,7 @@ resource "aws_ecs_service" "service_node_app" {
   name            = "service_node_app"
   cluster         = aws_ecs_cluster.project_cluster.id
   task_definition = aws_ecs_task_definition.project_task.arn
-  desired_count   = 3
+  desired_count   = 1
   launch_type = "EC2"
   health_check_grace_period_seconds = 300
   iam_role        = data.aws_iam_role.role_ecsServiceRole.arn
@@ -301,7 +301,7 @@ resource "aws_ecs_service" "service_node_app" {
 # Autoscaling for ECS Service instances
 resource "aws_appautoscaling_target" "ecs_target" {
   max_capacity       = 6
-  min_capacity       = 2
+  min_capacity       = 1
   resource_id        = "service/${aws_ecs_cluster.project_cluster.name}/${aws_ecs_service.service_node_app.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
@@ -320,7 +320,7 @@ resource "aws_appautoscaling_policy" "ecs_policy" {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
 
-    target_value = 70
+    target_value = 2
     scale_out_cooldown = 120
     scale_in_cooldown = 120
   }

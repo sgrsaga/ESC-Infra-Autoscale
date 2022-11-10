@@ -151,7 +151,7 @@ resource "aws_lb_listener" "alb_to_tg" {
   protocol = "HTTP"
   default_action {
     target_group_arn = aws_lb_target_group.ecs_alb_tg.id
-    type = "forwards"
+    type = "forward"
     /*
     redirect {
       port = 443
@@ -166,6 +166,7 @@ resource "aws_lb_listener" "alb_to_tg" {
 resource "aws_ecr_repository" "project_repo" {
   name = "project_repo_aws"
   image_tag_mutability = "MUTABLE"
+  force_delete = true # This will remove the repo with all the images as well in it.
 
   image_scanning_configuration {
     scan_on_push = true

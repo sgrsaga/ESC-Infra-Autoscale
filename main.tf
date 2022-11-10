@@ -22,11 +22,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-## For AWS Billing - to set blling alarms
-provider "aws" {
-  region = "us-east-1"
-  alias = "billing"
-}
 
 ## 1. Call IAM user create module to create user profile for profbob
 module "iam" {

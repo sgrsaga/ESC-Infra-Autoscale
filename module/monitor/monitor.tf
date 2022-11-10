@@ -34,8 +34,8 @@ resource "aws_cloudwatch_metric_alarm" "Billing_Alarm" {
   insufficient_data_actions = []
   treat_missing_data = "notBreaching"
 
-  dimensions {
-    Currency = "USD"
+  dimensions = {
+    currency = "USD"
   }
 }
 

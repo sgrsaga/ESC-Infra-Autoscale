@@ -46,7 +46,7 @@ resource "aws_s3_bucket" "lb_logs" {
 }
 
 resource "aws_s3_bucket_acl" "example" {
-  bucket = aws_s3_bucket.alb-access-logs-proj-test-20221110.id
+  bucket = aws_s3_bucket.lb_logs.id
   acl    = "private"
 }
 

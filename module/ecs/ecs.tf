@@ -55,7 +55,7 @@ resource "aws_s3_bucket_acl" "example" {
 data "aws_elb_service_account" "service_account_id" {}
 ## Get the callert identity
 data "aws_caller_identity" "caller_identity" {}
-
+/*
 ## Get the policy to allow PutObject permissions to service account
 data "aws_iam_policy_document" "allow_alb_write_perm" {
   statement {
@@ -71,11 +71,49 @@ data "aws_iam_policy_document" "allow_alb_write_perm" {
     ]
   }
 }
+*/
 
 ## Apply bucket policy to the bucket
 resource "aws_s3_bucket_policy" "access_logs_policy" {
     bucket = aws_s3_bucket.lb_logs.id
-    policy = data.aws_iam_policy_document.allow_alb_write_perm.json
+    policy = jsonencode({
+    Version: "2012-10-17",
+    Id: "AWSConsole-AccessLogs-Policy-1668059634986",
+    Statement: [
+        {
+            Sid: "AWSConsoleStmt-1668059634986",
+            Effect: "Allow",
+            Principal: {
+                AWS: "${data.aws_elb_service_account.service_account_id.arn}"
+            },
+            Action: "s3:PutObject",
+            Resource: "${aws_s3_bucket.lb_logs.arn}/AWSLogs/${data.aws_caller_identity.caller_identity.account_id}/*"
+        },
+        {
+            Sid: "AWSLogDeliveryWrite",
+            Effect: "Allow",
+            Principal: {
+                Service: "delivery.logs.amazonaws.com"
+            },
+            Action: "s3:PutObject",
+            Resource: "${aws_s3_bucket.lb_logs.arn}/AWSLogs/${data.aws_caller_identity.caller_identity.account_id}/*",
+            Condition: {
+                StringEquals: {
+                    "s3:x-amz-acl": "bucket-owner-full-control"
+                }
+            }
+        },
+        {
+            Sid: "AWSLogDeliveryAclCheck",
+            Effect: "Allow",
+            Principal: {
+                "Service": "delivery.logs.amazonaws.com"
+            },
+            Action: "s3:GetBucketAcl",
+            Resource: "${aws_s3_bucket.lb_logs.arn}"
+        }
+    ]
+    })
 }
 
 ## Enable SSE for the bucket

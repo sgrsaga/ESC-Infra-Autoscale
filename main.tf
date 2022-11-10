@@ -74,3 +74,10 @@ module "route53" {
     module.ecs_cluster
   ]
 }
+
+## 5. Create monitoring
+module "monitor_and_alarm" {
+  source = "./module/monitor"
+  delivery_email = var.delivery_email
+  
+}

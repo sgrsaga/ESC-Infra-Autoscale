@@ -170,3 +170,8 @@ variable "db_delete_protect" {
     type = string
     default = "false"
 }
+
+############## Monitor and Alert ############
+variable "delivery_email" {
+    type = string
+}

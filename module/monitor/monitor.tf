@@ -1,3 +1,40 @@
+## Alerting for
+# 1 Billing Alarm
+# 2 ECS Cluster CPU utilization alert
+# 3 ECS Cluster Memory utilization alert
+
+# To Do
+# 1 Create SNS Topic with with email addres linked
+resource "aws_sns_topic" "cloud_watch_notify" {
+  name = "CW_Alaerm_SNS_Topic"
+  fifo_topic = false
+}
+# 2 Create subscription for the topic
+resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
+  topic_arn = aws_sns_topic.cloud_watch_notify.arn
+  protocol  = "email"
+  endpoint  = var.email_address
+  endpoint_auto_confirms = true
+}
+
+# Billing alarm
+resource "aws_cloudwatch_metric_alarm" "Disk_Alert_Validator" {
+  alarm_name          = "Billing Alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  datapoints_to_alarm = "3"
+  evaluation_periods  = "5"
+  metric_name         = "EstimatedCharges"
+  namespace           = "AWS/Billing"
+  period                    = "7200"
+  statistic                 = "Maximum"
+  threshold                 = "3"
+  alarm_description         = "Billing amount exceed the threshold of $3 for the duration"
+  actions_enabled           = true
+  alarm_actions             = aws_sns_topic.cloud_watch_notify.arn
+  insufficient_data_actions = []
+  treat_missing_data        = "notBreaching"
+}
+
 /*
 ## Disk Alerts for Validators
 resource "aws_cloudwatch_metric_alarm" "Disk_Alert_Validator" {

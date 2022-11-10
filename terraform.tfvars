@@ -57,3 +57,7 @@ db_username = "Project"
 is_storage_encrypted = "true"
 max_allocated_storage_value = 500
 muli_az_enable = "true"
+
+
+############ Monito and Alarm
+delivery_email = "sgrsagara@gmail.com"

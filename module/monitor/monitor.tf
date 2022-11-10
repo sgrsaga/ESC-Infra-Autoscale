@@ -25,7 +25,7 @@ resource "aws_cloudwatch_metric_alarm" "Disk_Alert_Validator" {
   evaluation_periods  = "5"
   metric_name         = "EstimatedCharges"
   namespace           = "AWS/Billing"
-  period                    = "7200"
+  period                    = "21600"
   statistic                 = "Maximum"
   threshold                 = "3"
   alarm_description         = "Billing amount exceed the threshold of $3 for the duration"

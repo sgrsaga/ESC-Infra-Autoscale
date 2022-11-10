@@ -79,5 +79,10 @@ module "route53" {
 module "monitor_and_alarm" {
   source = "./module/monitor"
   delivery_email = var.delivery_email
+  depends_on = [
+    module.main_network,
+    module.ecs_cluster,
+    module.route53
+  ]
   
 }

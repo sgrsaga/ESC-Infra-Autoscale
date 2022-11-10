@@ -28,15 +28,14 @@ resource "aws_cloudwatch_metric_alarm" "Billing_Alarm" {
   evaluation_periods  = "1" #
   metric_name = "EstimatedCharges" #
   namespace = "AWS/Billing" #
-  period = "28800" #
+  period = "21600" #
   statistic = "Maximum" #
   threshold = "3" #
   alarm_description = "Billing amount exceed the threshold of $3 for the duration" #
   alarm_actions = ["${aws_sns_topic.cloud_watch_notify.arn}"] #
 
   dimensions = {
-    currency = "USD" #
-    linked_account = data.aws_caller_identity.current.account_id #
+    Currency = "USD" #
   }
 }
 

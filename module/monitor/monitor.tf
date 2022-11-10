@@ -21,8 +21,8 @@ resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
 resource "aws_cloudwatch_metric_alarm" "Disk_Alert_Validator" {
   alarm_name          = "Billing Alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  datapoints_to_alarm = "3"
-  evaluation_periods  = "5"
+  datapoints_to_alarm = "1"
+  evaluation_periods  = "2"
   metric_name         = "EstimatedCharges"
   namespace           = "AWS/Billing"
   period                    = "21600"

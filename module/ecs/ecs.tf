@@ -38,7 +38,7 @@ resource "aws_iam_instance_profile" "ecs_agent_profile" {
 ## Create S3 bucket for access_logs
 resource "aws_s3_bucket" "lb_logs" {
   bucket = "alb-access-logs-proj-test-20221110"
-
+  force_destroy = true ## To handle none empty S3 bucket. Destroy with Terraform destroy.
   tags = {
     Name        = "ALB_LOG_Bucket"
     Environment = "alb"

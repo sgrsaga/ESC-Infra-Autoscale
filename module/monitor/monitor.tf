@@ -39,6 +39,7 @@ resource "aws_cloudwatch_metric_alarm" "Billing_Alarm" {
   }
 }
 
+/*
 ## ECS Cluster CPU utilization alert
 resource "aws_cloudwatch_metric_alarm" "ECS_Cluster_CPU" {
   alarm_name          = "Billing Alarm"
@@ -56,7 +57,7 @@ resource "aws_cloudwatch_metric_alarm" "ECS_Cluster_CPU" {
   insufficient_data_actions = []
   treat_missing_data        = "notBreaching"
 }
-
+*/
 
 /*
 ## Disk Alerts for Validators

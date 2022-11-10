@@ -13,7 +13,7 @@ resource "aws_sns_topic" "cloud_watch_notify" {
 resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
   topic_arn = aws_sns_topic.cloud_watch_notify.arn
   protocol  = "email"
-  endpoint  = var.email_address
+  endpoint  = var.delivery_email
   endpoint_auto_confirms = true
 }
 

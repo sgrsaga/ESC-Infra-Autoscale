@@ -62,7 +62,7 @@ module "ecs_cluster" {
   depends_on = [module.main_network] 
 }
 
-/*
+
 ## 4. Route 53 Configuration
 module "route53" {
   source = "./module/r53"
@@ -74,5 +74,3 @@ module "route53" {
     module.ecs_cluster
   ]
 }
-
-*/

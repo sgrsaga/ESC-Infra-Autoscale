@@ -44,35 +44,11 @@ resource "aws_s3_bucket" "lb_logs" {
     Environment = "alb"
   }
 }
-/*
-resource "aws_s3_bucket_acl" "example" {
-  bucket = aws_s3_bucket.lb_logs.id
-  acl    = "private"
-}
-*/
 ##
 ## GEt the service Account ID
 data "aws_elb_service_account" "service_account_id" {}
 ## Get the callert identity
 data "aws_caller_identity" "caller_identity" {}
-/*
-## Get the policy to allow PutObject permissions to service account
-data "aws_iam_policy_document" "allow_alb_write_perm" {
-  statement {
-    principals {
-      type = "AWS"
-      identifiers = ["${data.aws_elb_service_account.service_account_id.arn}"]
-    }
-    actions = [
-      "s3:PutObject","s3:GetBucketAcl"
-    ]
-    resources = [
-      "${aws_s3_bucket.lb_logs.arn}/*"
-    ]
-  }
-}
-*/
-
 ## Apply bucket policy to the bucket
 resource "aws_s3_bucket_policy" "access_logs_policy" {
     bucket = aws_s3_bucket.lb_logs.id
@@ -290,12 +266,10 @@ resource "aws_autoscalingplans_scaling_plan" "ec2_scaling_plan" {
       predefined_scaling_metric_specification {
         predefined_scaling_metric_type = "ASGAverageCPUUtilization"
       }
-
       target_value = 70
     }
   }
 }
-
 
 # ECS Service configuration - This block maintain the link between all services.
 resource "aws_ecs_service" "service_node_app" {
@@ -309,7 +283,8 @@ resource "aws_ecs_service" "service_node_app" {
   depends_on      = [
     aws_ecs_cluster.project_cluster, 
     aws_ecs_task_definition.project_task,
-    aws_lb_listener.alb_to_tg
+    aws_lb_listener.alb_to_tg,
+    aws_lb_target_group.ecs_alb_tg
     ]
   lifecycle {
     ignore_changes = [desired_count]

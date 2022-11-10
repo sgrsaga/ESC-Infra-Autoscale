@@ -22,7 +22,7 @@ resource "aws_cloudwatch_metric_alarm" "Billing_Alarm" {
   alarm_name = "Billing Alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   #datapoints_to_alarm = "1"
-  evaluation_periods  = "1"
+  evaluation_periods  = "2"
   metric_name = "EstimatedCharges"
   namespace = "AWS/Billing"
   period = "${6*60*60}"
@@ -39,25 +39,29 @@ resource "aws_cloudwatch_metric_alarm" "Billing_Alarm" {
   }
 }
 
-/*
+
 ## ECS Cluster CPU utilization alert
 resource "aws_cloudwatch_metric_alarm" "ECS_Cluster_CPU" {
-  alarm_name          = "Billing Alarm"
+  alarm_name          = "ECS Cluster CPUUtilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  datapoints_to_alarm = "1"
-  evaluation_periods  = "2"
-  metric_name         = "EstimatedCharges"
-  namespace           = "AWS/Billing"
-  period                    = "21600"
+  datapoints_to_alarm = "2"
+  evaluation_periods  = "3"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period                    = "300"
   statistic                 = "Maximum"
-  threshold                 = "3"
-  alarm_description         = "Billing amount exceed the threshold of $3 for the duration"
+  threshold                 = "5"
+  alarm_description         = "ECS Cluster CPU exceed the threshold for the duration"
   actions_enabled           = true
   alarm_actions             = ["${aws_sns_topic.cloud_watch_notify.arn}"]
   insufficient_data_actions = []
   treat_missing_data        = "notBreaching"
+  dimensions = {
+    ClusterName = "project_cluster"
+    ServiceName = "service_node_app"
+  }
 }
-*/
+
 
 /*
 ## Disk Alerts for Validators

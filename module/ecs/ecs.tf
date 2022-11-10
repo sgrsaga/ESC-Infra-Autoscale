@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "allow_alb_write_perm" {
   statement {
     principals {
       type = "AWS"
-      identifier = ["${data.aws_elb_service_account.service_account_id.arn}"]
+      identifiers = ["${data.aws_elb_service_account.service_account_id.arn}"]
     }
     actions = [
       "s3:PutObject","s3:GetBucketAcl"

@@ -35,6 +35,20 @@ resource "aws_iam_instance_profile" "ecs_agent_profile" {
   role = data.aws_iam_role.role_ecsInstanceRole.name
 }
 
+## S3 bucket for access_logs
+resource "aws_s3_bucket" "lb_logs" {
+  bucket = "alb-access-logs-proj-test-20221110"
+
+  tags = {
+    Name        = "ALB_LOG_Bucket"
+    Environment = "alb"
+  }
+}
+
+resource "aws_s3_bucket_acl" "example" {
+  bucket = aws_s3_bucket.alb-access-logs-proj-test-20221110.id
+  acl    = "private"
+}
 
 # Create Application Load balancer
 resource "aws_lb" "ecs_lb" {
@@ -48,6 +62,11 @@ resource "aws_lb" "ecs_lb" {
   enable_deletion_protection = false
   tags = {
     Environment = "Project"
+  }
+  access_logs {
+    bucket  = aws_s3_bucket.lb_logs.bucket
+    prefix  = "access-lb"
+    enabled = true
   }
 }
 

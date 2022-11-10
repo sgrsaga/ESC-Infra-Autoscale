@@ -44,7 +44,7 @@ module "main_network" {
   public_rt = var.public_rt
   private_rt = var.private_rt
 }
-
+/*
 ## 3. Call Databse creation module
 module "pg_database" {
   source = "./module/rds"
@@ -53,7 +53,7 @@ module "pg_database" {
   db_name = var.db_name
   depends_on = [module.main_network] 
 }
-
+*/
 
 ## 4. Call ECS creation module
 module "ecs_cluster" {
@@ -63,18 +63,6 @@ module "ecs_cluster" {
 }
 
 /*
-## 4.1 Call ECS service autoscaling module
-module "ecs-service-autoscaling" {
-  source  = "cn-terraform/ecs-service-autoscaling/aws"
-  version = "1.0.6"
-  name_prefix = "Project_prefix"
-  ecs_service_name = module.ecs_cluster.ecs_service_name
-  ecs_cluster_name = module.ecs_cluster.ecs_cluster_name
-  # insert the 3 required variables here
-  depends_on = [module.ecs_cluster]
-}
-*/
-
 ## 4. Route 53 Configuration
 module "route53" {
   source = "./module/r53"
@@ -86,3 +74,4 @@ module "route53" {
     module.ecs_cluster
   ]
 }
+*/

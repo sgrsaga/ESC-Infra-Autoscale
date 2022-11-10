@@ -67,7 +67,7 @@ data "aws_iam_policy_document" "allow_alb_write_perm" {
       "s3:PutObject","s3:GetBucketAcl"
     ]
     resources = [
-      "${aws_s3_bucket.lb_logs.arn}/AWSLogs/${data.aws_caller_identity.caller_identity.account_id}/*"
+      "${aws_s3_bucket.lb_logs.arn}/*"
     ]
   }
 }

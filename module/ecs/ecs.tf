@@ -151,14 +151,14 @@ resource "aws_lb_listener" "alb_to_tg" {
   protocol = "HTTP"
   default_action {
     target_group_arn = aws_lb_target_group.ecs_alb_tg.id
-    type = "redirect"
-    
+    type = "forwards"
+    /*
     redirect {
       port = 443
       protocol = "HTTPS"
       status_code = "HTTP_301"
     }
-    
+    */
   }
 }
 

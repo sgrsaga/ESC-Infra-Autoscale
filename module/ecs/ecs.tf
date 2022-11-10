@@ -35,7 +35,7 @@ resource "aws_iam_instance_profile" "ecs_agent_profile" {
   role = data.aws_iam_role.role_ecsInstanceRole.name
 }
 
-################### S3 bucket for access_logs
+## Create S3 bucket for access_logs
 resource "aws_s3_bucket" "lb_logs" {
   bucket = "alb-access-logs-proj-test-20221110"
 
@@ -44,7 +44,7 @@ resource "aws_s3_bucket" "lb_logs" {
     Environment = "alb"
   }
 }
-##
+
 ## GEt the service Account ID
 data "aws_elb_service_account" "service_account_id" {}
 ## Get the callert identity
@@ -92,7 +92,7 @@ resource "aws_s3_bucket_policy" "access_logs_policy" {
     })
 }
 
-## Enable SSE for the bucket
+## Enable SSE encryption for the bucket
 resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs_encryption" {
   bucket = "${aws_s3_bucket.lb_logs.bucket}"
 
@@ -150,7 +150,7 @@ resource "aws_lb_listener" "alb_to_tg" {
   port = 80
   protocol = "HTTP"
   default_action {
-    #target_group_arn = aws_lb_target_group.ecs_alb_tg.id
+    target_group_arn = aws_lb_target_group.ecs_alb_tg.id
     type = "redirect"
 
     redirect {

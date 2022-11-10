@@ -35,7 +35,7 @@ resource "aws_iam_instance_profile" "ecs_agent_profile" {
   role = data.aws_iam_role.role_ecsInstanceRole.name
 }
 
-## S3 bucket for access_logs
+################### S3 bucket for access_logs
 resource "aws_s3_bucket" "lb_logs" {
   bucket = "alb-access-logs-proj-test-20221110"
 
@@ -44,11 +44,51 @@ resource "aws_s3_bucket" "lb_logs" {
     Environment = "alb"
   }
 }
-
+/*
 resource "aws_s3_bucket_acl" "example" {
   bucket = aws_s3_bucket.lb_logs.id
   acl    = "private"
 }
+*/
+##
+## GEt the service Account ID
+data "aws_elb_service_account" "service_account_id" {}
+## Get the callert identity
+data "aws_caller_identity" "caller_identity" {}
+
+## Get the policy to allow PutObject permissions to service account
+data "aws_iam_policy_document" "allow_alb_write_perm" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = ["${data.aws_elb_service_account.service_account_id.arn}"]
+    }
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = [
+      "${aws_s3_bucket.lb_logs.arn}/alb_logs/AWSLogs/${data.aws_caller_identity.caller_identity.account_id}/*",
+    ]
+  }
+}
+
+## Apply bucket policy to the bucket
+resource "aws_s3_bucket_policy" "access_logs_policy" {
+    bucket = "${aws_s3_bucket.lb_logs.id}"
+    policy = data.aws_iam_policy_document.allow_alb_write_perm.json
+}
+
+## Enable SSE for the bucket
+resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs_encryption" {
+  bucket = "${aws_s3_bucket.lb_logs.bucket}"
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "AES256"
+    }
+  }
+}
+###############################################
 
 # Create Application Load balancer
 resource "aws_lb" "ecs_lb" {
@@ -68,6 +108,10 @@ resource "aws_lb" "ecs_lb" {
     prefix  = "access-lb"
     enabled = true
   }
+  depends_on = [
+    aws_s3_bucket.lb_logs,
+    aws_s3_bucket_policy.access_logs_policy
+  ]
 }
 
 # Target Group for ALB

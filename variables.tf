@@ -172,6 +172,34 @@ variable "db_delete_protect" {
 }
 
 ############## Monitor and Alert ############
+## Notification email address
 variable "delivery_email" {
     type = string
+}
+
+## Billing threshold
+variable "bill_threshold_amount" {
+    type = number
+}
+
+
+############## ECS SErvice configure
+## MAX Running task count
+variable "max_tasks" {
+    type = number  
+}
+
+## MIN Running task count
+variable "min_tasks" {
+    type = number  
+}
+
+## EC2 AutoScaling AVG CPU threshold 
+variable "asg_avg_cpu_target" {
+    type = number  
+}
+
+## ECS Task AutoScaling AVG CPU threshold 
+variable "ecs_task_avg_cpu_target" {
+    type = number  
 }

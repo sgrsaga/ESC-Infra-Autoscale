@@ -16,26 +16,22 @@ resource "aws_sns_topic_subscription" "email_subscription" {
   endpoint_auto_confirms = true
 }
 
-# Get the Account ID
-data "aws_caller_identity" "current" {}
-output "account_id" {
-    value = data.aws_caller_identity.current.account_id  
-}
+
 # Billing alarm
 resource "aws_cloudwatch_metric_alarm" "Billing_Alarm" {
   alarm_name = "Billing Alarm" #
-  comparison_operator = "GreaterThanOrEqualToThreshold" #
-  evaluation_periods  = "1" #
-  metric_name = "EstimatedCharges" #
-  namespace = "AWS/Billing" #
-  period = "21600" #
-  statistic = "Maximum" #
-  threshold = "3" #
-  alarm_description = "Billing amount exceed the threshold of $3 for the duration" #
-  alarm_actions = ["${aws_sns_topic.cloud_watch_notify.arn}"] #
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name = "EstimatedCharges"
+  namespace = "AWS/Billing"
+  period = "21600"
+  statistic = "Maximum"
+  threshold = var.bill_threshold_amount
+  alarm_description = "Billing amount exceed the threshold of ${var.bill_threshold_amount} for the duration"
+  alarm_actions = ["${aws_sns_topic.cloud_watch_notify.arn}"]
 
   dimensions = {
-    Currency = "USD" #
+    Currency = "USD"
   }
 }
 
@@ -48,7 +44,7 @@ resource "aws_cloudwatch_metric_alarm" "ECS_Cluster_CPU" {
   evaluation_periods  = "3"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/ECS"
-  period                    = "300"
+  period                    = "60"
   statistic                 = "Maximum"
   threshold                 = "0.003"
   alarm_description         = "ECS Cluster CPU exceed the threshold for the duration"
@@ -70,7 +66,7 @@ resource "aws_cloudwatch_metric_alarm" "ECS_Cluster_MEM" {
   evaluation_periods  = "3"
   metric_name         = "MemoryUtilization"
   namespace           = "AWS/ECS"
-  period                    = "300"
+  period                    = "60"
   statistic                 = "Maximum"
   threshold                 = "0.15"
   alarm_description         = "ECS Cluster Memory exceed the threshold for the duration"

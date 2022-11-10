@@ -60,4 +60,11 @@ muli_az_enable = "true"
 
 
 ############ Monito and Alarm
-delivery_email = "sgrsagara@gmail.com"
+delivery_email = "encompass@live.ca"
+bill_threshold_amount = 3
+
+############ ECS Cluster variables
+max_tasks = 6
+min_tasks = 1
+asg_avg_cpu_target = 1.75
+ecs_task_avg_cpu_target = 0.25

@@ -59,6 +59,10 @@ module "pg_database" {
 module "ecs_cluster" {
   source = "./module/ecs"
   vpc_id = module.main_network.vpc_id
+  max_tasks = var.max_tasks
+  min_tasks = var.min_tasks
+  asg_avg_cpu_target = var.asg_avg_cpu_target
+  ecs_task_avg_cpu_target = var.ecs_task_avg_cpu_target
   depends_on = [module.main_network] 
 }
 
@@ -79,6 +83,7 @@ module "route53" {
 module "monitor_and_alarm" {
   source = "./module/monitor"
   delivery_email = var.delivery_email
+  bill_threshold_amount = var.bill_threshold_amount
   depends_on = [
     module.main_network,
     module.ecs_cluster,

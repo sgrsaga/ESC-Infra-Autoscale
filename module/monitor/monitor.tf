@@ -19,7 +19,6 @@ resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
 
 # Billing alarm
 resource "aws_cloudwatch_metric_alarm" "Billing_Alarm" {
-  provider = "aws.billing"
   alarm_name = "Billing Alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   #datapoints_to_alarm = "1"

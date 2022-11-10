@@ -60,14 +60,14 @@ data "aws_caller_identity" "caller_identity" {}
 data "aws_iam_policy_document" "allow_alb_write_perm" {
   statement {
     principals {
-      type        = "AWS"
-      identifiers = ["${data.aws_elb_service_account.service_account_id.arn}"]
+      type = "AWS"
+      identifier = ["${data.aws_elb_service_account.service_account_id.arn}"]
     }
     actions = [
-      "s3:PutObject"
+      "s3:PutObject","s3:GetBucketAcl"
     ]
     resources = [
-      "${aws_s3_bucket.lb_logs.arn}/alb_logs/AWSLogs/${data.aws_caller_identity.caller_identity.account_id}/*",
+      "${aws_s3_bucket.lb_logs.arn}/${aws_s3_bucket.lb_logs.id}/AWSLogs/${data.aws_caller_identity.caller_identity.account_id}/*",
     ]
   }
 }

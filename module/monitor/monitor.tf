@@ -22,8 +22,8 @@ resource "aws_cloudwatch_metric_alarm" "Billing_Alarm" {
   provider = "aws.billing"
   alarm_name = "Billing Alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  datapoints_to_alarm = "1"
-  evaluation_periods  = "2"
+  #datapoints_to_alarm = "1"
+  evaluation_periods  = "1"
   metric_name = "EstimatedCharges"
   namespace = "AWS/Billing"
   period = "${6*60*60}"
@@ -34,6 +34,10 @@ resource "aws_cloudwatch_metric_alarm" "Billing_Alarm" {
   alarm_actions = ["${aws_sns_topic.cloud_watch_notify.arn}"]
   insufficient_data_actions = []
   treat_missing_data = "notBreaching"
+
+  dimensions {
+    Currency = "USD"
+  }
 }
 
 ## ECS Cluster CPU utilization alert

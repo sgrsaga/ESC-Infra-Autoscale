@@ -1,6 +1,6 @@
 ## This module is to create IAM user for GUI Access
 resource "aws_iam_user" "profbob" {
-  name          = "profbob"
+  name          = var.username
   path          = "/"
   force_destroy = true
 }

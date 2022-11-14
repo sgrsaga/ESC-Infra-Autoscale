@@ -1,3 +1,9 @@
+### IAM user
+## username
+variable "username" {
+  type = string
+}
+
 # 1.1. Create a VPC
 variable "vpc_name" {
   type = string
@@ -184,12 +190,30 @@ variable "bill_threshold_amount" {
 
 
 ############## ECS SErvice configure
-## MAX Running task count
+## Autosacling EC2 parameters
+# EC2 image id
+variable "ec2_image_id" {
+    type = string  
+}
+# EC2 instance type
+variable "ec2_instance_type" {
+    type = string  
+}
+## Created Keyname
+variable "ssh_keyname" {
+    type = string  
+}
+## ALB Access logs saving bucket name
+variable "alb_access_log_s3_bucket" {
+    type = string
+}
+
+## MAX Running EC2 and task count
 variable "max_tasks" {
     type = number  
 }
 
-## MIN Running task count
+## MIN Running EC2 and task count
 variable "min_tasks" {
     type = number  
 }
@@ -202,4 +226,11 @@ variable "asg_avg_cpu_target" {
 ## ECS Task AutoScaling AVG CPU threshold 
 variable "ecs_task_avg_cpu_target" {
     type = number  
+}
+
+
+######### Route 53
+## DNS Name- There should be a Hosted zone available for the DNS
+variable "domain_name_used" {
+    type = string  
 }

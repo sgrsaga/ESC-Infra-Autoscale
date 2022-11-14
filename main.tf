@@ -26,7 +26,7 @@ provider "aws" {
 ## 1. Call IAM user create module to create user profile for profbob
 module "iam" {
   source = "./module/iam"
-  
+  username = var.username  
 }
 
 ## 2. Call the Network module to generate VPC components
@@ -44,7 +44,7 @@ module "main_network" {
   public_rt = var.public_rt
   private_rt = var.private_rt
 }
-/*
+
 ## 3. Call Databse creation module
 module "pg_database" {
   source = "./module/rds"
@@ -53,15 +53,20 @@ module "pg_database" {
   db_name = var.db_name
   depends_on = [module.main_network] 
 }
-*/
+
 
 ## 4. Call ECS creation module
 module "ecs_cluster" {
   source = "./module/ecs"
   vpc_id = module.main_network.vpc_id
+  ## ALB Access logs S3 bucket
+  alb_access_log_s3_bucket = var.alb_access_log_s3_bucket
+  ## MIN and MAX value are used to define minimim and maximum EC2 and Task counts
   max_tasks = var.max_tasks
   min_tasks = var.min_tasks
+  ## EC2 autoscaling triggering CPU target value
   asg_avg_cpu_target = var.asg_avg_cpu_target
+  ## ECS Service task scaling CPU target value
   ecs_task_avg_cpu_target = var.ecs_task_avg_cpu_target
   depends_on = [module.main_network] 
 }
@@ -70,6 +75,7 @@ module "ecs_cluster" {
 ## 4. Route 53 Configuration
 module "route53" {
   source = "./module/r53"
+  domain_name_used = var.domain_name_used
   target_group_arn = module.ecs_cluster.lb_target_group
   ecs_alb_arn = module.ecs_cluster.ecs_alb
   alb_dns_name = module.ecs_cluster.ecs_alb_dns

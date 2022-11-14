@@ -1,3 +1,7 @@
+## Create IAM user
+username = "profbob"
+
+###### VPC parameters
 # 1. Create a VPC
 vpc_name = "Project_VPC"
 vpc_cidr = "10.0.0.0/16"
@@ -59,12 +63,20 @@ max_allocated_storage_value = 500
 muli_az_enable = "true"
 
 
-############ Monito and Alarm
+############ Monitor and Alarm
 delivery_email = "encompass@live.ca"
 bill_threshold_amount = 3
 
 ############ ECS Cluster variables
+alb_access_log_s3_bucket = "alb-access-logs-proj-test-20221110"
+## Autosacling EC2 parameters
+ec2_image_id = "ami-03dbf0c122cb6cf1d"
+ec2_instance_type = "t2.micro"
+ssh_keyname = "EcsKey"
 max_tasks = 6
 min_tasks = 1
 asg_avg_cpu_target = 1.75
 ecs_task_avg_cpu_target = 0.25
+
+############# Route 53 #####
+domain_name_used = "ideamics.com"

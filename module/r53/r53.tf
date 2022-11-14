@@ -1,6 +1,6 @@
 ## Request Certificate
 resource "aws_acm_certificate" "ideamics_crt" {
-  domain_name       = "ideamics.com"
+  domain_name       = var.domain_name_used
   validation_method = "DNS"
 }
 ## Validate FQDN
@@ -12,14 +12,14 @@ resource "aws_acm_certificate_validation" "ideamics_validation" {
 
 ## Get Route 53 zone details
 data "aws_route53_zone" "ideamics_r53z" {
-  name         = "ideamics.com"
+  name         = var.domain_name_used
   private_zone = false
 }
 
 ## Create record in hosted zone for ALB in A type alias
 resource "aws_route53_record" "ideamics_a_record" {
   zone_id = data.aws_route53_zone.ideamics_r53z.zone_id
-  name    = "ideamics.com"
+  name    = var.domain_name_used
   type    = "A"
   alias {
     name = var.alb_dns_name

@@ -37,8 +37,7 @@ resource "random_password" "db_master_pass"{
 ## Create random value as AWS SecretManager Secret name postfix
 resource "random_password" "sm_postfix"{
   length           = 5
-  special          = true
-  override_special = "_!%^"
+  special          = false
 }
 
 ## Create secret in Password manager

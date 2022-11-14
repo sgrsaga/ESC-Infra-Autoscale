@@ -61,6 +61,11 @@ module "ecs_cluster" {
   vpc_id = module.main_network.vpc_id
   ## ALB Access logs S3 bucket
   alb_access_log_s3_bucket = var.alb_access_log_s3_bucket
+  ## Autoscaling EC2 parameters
+  ec2_image_id = var.ec2_image_id
+  ec2_instance_type = var.ec2_instance_type
+  ssh_keyname = var.ssh_keyname
+
   ## MIN and MAX value are used to define minimim and maximum EC2 and Task counts
   max_tasks = var.max_tasks
   min_tasks = var.min_tasks

@@ -64,11 +64,11 @@ muli_az_enable = "true"
 
 
 ############ Monitor and Alarm
-delivery_email = "encompass@live.ca"
+delivery_email = "sgrsagara@gmail.com"
 bill_threshold_amount = 3
 
 ############ ECS Cluster variables
-alb_access_log_s3_bucket = "alb-access-logs-proj-test-20221110"
+alb_access_log_s3_bucket = "alb-access-logs-sgr-test-20221116"
 ## Autosacling EC2 parameters
 ec2_image_id = "ami-03dbf0c122cb6cf1d"
 ec2_instance_type = "t2.micro"
@@ -79,4 +79,4 @@ asg_avg_cpu_target = 1.75
 ecs_task_avg_cpu_target = 0.25
 
 ############# Route 53 #####
-domain_name_used = "ideamics.com"
+domain_name_used = "devops-expert.online"

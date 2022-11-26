@@ -40,12 +40,13 @@ resource "random_string" "sm_postfix_prof"{
   override_special = "-"
 }
 
+/*
 # Create Instance Profile for Proffesor
 resource "aws_iam_instance_profile" "profbob" {
   name = "profbob-${random_string.sm_postfix_prof.result}"
   role = aws_iam_role.profbob.name
 }
-
+*/
 
 resource "aws_iam_policy_attachment" "profbob-attach" {
   name       = "profbob-attach"

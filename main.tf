@@ -7,7 +7,7 @@ terraform {
     }
   }
 }
-
+/*
 ## Setting the AWS S3 as the Terraform backend
 terraform {
   backend "s3" {
@@ -16,7 +16,7 @@ terraform {
     region = "us-east-1"
   }
 }
-
+*/
 
 provider "aws" {
   region = "us-east-1"
@@ -58,6 +58,7 @@ module "pg_database" {
   db_identifier = var.db_identifier
   vpc_id = module.main_network.vpc_id
   db_name = var.db_name
+  db_subnet_group_name = var.db_subnet_group_name
   depends_on = [module.main_network] 
 }
 

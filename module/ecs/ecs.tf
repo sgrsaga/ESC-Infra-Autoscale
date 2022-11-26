@@ -26,7 +26,7 @@ data "aws_iam_policy" "AmazonEC2ContainerServiceRolePolicy" {
   arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"  
 }
 */
-resource "aws_iam_role" "ecsServiceRole" {
+resource "aws_iam_role" "ecsServiceRoleNew" {
   name = "ecsServiceRoleNew"
 
   assume_role_policy = <<EOF
@@ -47,7 +47,7 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "EcsEc2PolicyRoleAttach" {
-  role       = aws_iam_role.ecsServiceRole.name
+  role       = aws_iam_role.ecsServiceRoleNew.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
 }
 
@@ -57,7 +57,7 @@ data "aws_iam_role" "role_ecsTaskExecutionRole" {
   name = "ecsTaskExecutionRole"
 }
 */
-resource "aws_iam_role" "ecsTaskExecutionRole" {
+resource "aws_iam_role" "ecsTaskExecutionRoleNew" {
   name = "ecsTaskExecutionRoleNew"
 
   assume_role_policy = <<EOF
@@ -78,7 +78,7 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "EcsTaskExcPolicyRoleAttach" {
-  role       = aws_iam_role.ecsTaskExecutionRole.name
+  role       = aws_iam_role.ecsTaskExecutionRoleNew.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
@@ -119,7 +119,7 @@ data "aws_iam_role" "role_ecsInstanceRole" {
   name = "ecsInstanceRole"
 }
 */
-resource "aws_iam_role" "ecsInstanceRole" {
+resource "aws_iam_role" "ecsInstanceRoleNew" {
   name = "ecsInstanceRoleNew"
 
   assume_role_policy = <<EOF
@@ -140,7 +140,7 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "Ec2ContainerServicePolicyRoleAttach" {
-  role       = aws_iam_role.ecsInstanceRole.name
+  role       = aws_iam_role.ecsInstanceRoleNew.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 ##---------------

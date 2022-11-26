@@ -50,6 +50,7 @@ db_identifier = "project-db"
 db_backup_retention_period = 7
 db_class = "db.t3.micro"
 db_delete_protect = "false"
+db_subnet_group_name = "postgres_sg"
 db_engine = "postgres"
 db_engine_version = "12.9"
 db_name = "Project_db"

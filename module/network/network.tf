@@ -92,18 +92,50 @@ resource "aws_subnet" "private_subnet" {
 
 
 # 2.3. Associate public Subnets to Public Route table
+data "aws_subnets" "public_subnets_list" {
+  filter {
+    name = "vpc-id"
+    value = aws_vpc.new_vpc.id
+  }
+  tags = {
+    Access = "PUBLIC"
+  }
+  depends_on = [
+    aws_subnet.public_subnet
+  ]
+}
+
 resource "aws_route_table_association" "public_rt_subnet_association" {
-  count = length(var.public_subnets) > 0 ? length(var.public_subnets) : 0
+  count = length(data.aws_subnets.public_subnets_list.ids) > 0 ? length(data.aws_subnets.public_subnets_list.ids) : 0
   route_table_id = aws_route_table.public_route.id
   subnet_id = element(aws_subnet.public_subnet.*.id, count.index )
+  depends_on = [
+    aws_subnet.public_subnet
+  ]
 }
 
 
 # 2.5. Associate private subnets to the Private route tables
+data "aws_subnets" "private_subnets_list" {
+  filter {
+    name = "vpc-id"
+    value = aws_vpc.new_vpc.id
+  }
+  tags = {
+    Access = "PRIVATE"
+  }
+  depends_on = [
+    aws_subnet.private_subnet
+  ]
+}
+
 resource "aws_route_table_association" "private_rt_subnet_association" {
-  count = length(var.private_subnets) > 0 ? length(var.private_subnets) : 0
+  count = length(data.aws_subnets.private_subnets_list.ids) > 0 ? length(data.aws_subnets.private_subnets_list.ids) : 0
   route_table_id = aws_route_table.private_route.id
   subnet_id = element(aws_subnet.private_subnet.*.id, count.index )
+  depends_on = [
+    aws_subnet.private_subnet
+  ]
 }
 
 

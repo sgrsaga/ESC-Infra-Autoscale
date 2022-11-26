@@ -397,7 +397,7 @@ resource "aws_ecs_service" "service_node_app" {
   desired_count   = 1
   launch_type = "EC2"
   health_check_grace_period_seconds = 300
-  iam_role        = aws_iam_role.ecsServiceRole.arn
+  iam_role        = aws_iam_role.ecsServiceRoleNew.arn
   depends_on      = [
     aws_ecs_cluster.project_cluster, 
     aws_ecs_task_definition.project_task,

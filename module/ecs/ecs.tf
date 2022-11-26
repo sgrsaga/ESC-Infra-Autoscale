@@ -148,7 +148,7 @@ resource "aws_iam_role_policy_attachment" "Ec2ContainerServicePolicyRoleAttach" 
 # Create Instance Profile for ECS EC2 instances to use in Launch Configuration
 resource "aws_iam_instance_profile" "ecs_agent_profile" {
   name = "ecs-agent"
-  role = aws_iam_role.ecsInstanceRole.name
+  role = aws_iam_role.ecsInstanceRoleNew.name
 }
 
 ## Create S3 bucket for access_logs
@@ -302,7 +302,7 @@ resource "aws_ecs_cluster" "project_cluster" {
 # Task definitions to use in Service
 resource "aws_ecs_task_definition" "project_task" {
   family = "project_task"
-  execution_role_arn = aws_iam_role.ecsTaskExecutionRole.arn
+  execution_role_arn = aws_iam_role.ecsTaskExecutionRoleNew.arn
   container_definitions = jsonencode([
     {
       name      = "AppTask"

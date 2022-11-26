@@ -33,9 +33,16 @@ resource "aws_iam_user" "profbob" {
   force_destroy = true
 }
 
+## Create random value for profile
+resource "random_string" "sm_postfix_prof"{
+  length           = 8
+  special          = false
+  override_special = "-"
+}
+
 # Create Instance Profile for Proffesor
 resource "aws_iam_instance_profile" "profbob" {
-  name = "profbob-${random_string.instance_profile.result}"
+  name = "profbob-${random_string.sm_postfix_prof.result}"
   role = aws_iam_role.profbob.name
 }
 

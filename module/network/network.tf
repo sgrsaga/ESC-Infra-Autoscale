@@ -95,7 +95,7 @@ resource "aws_subnet" "private_subnet" {
 data "aws_subnets" "public_subnets_list" {
   filter {
     name = "vpc-id"
-    values = aws_vpc.new_vpc.id
+    values = [aws_vpc.new_vpc.id]
   }
   tags = {
     Access = "PUBLIC"
@@ -119,7 +119,7 @@ resource "aws_route_table_association" "public_rt_subnet_association" {
 data "aws_subnets" "private_subnets_list" {
   filter {
     name = "vpc-id"
-    values = aws_vpc.new_vpc.id
+    values = [aws_vpc.new_vpc.id]
   }
   tags = {
     Access = "PRIVATE"

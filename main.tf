@@ -20,6 +20,13 @@ terraform {
 
 provider "aws" {
   region = "us-east-1"
+  default_tags {
+   tags = {
+     Environment = "PROJECT-001"
+     Owner = "MyProject"
+     Goal = "TestECS"
+   }
+ }
 }
 
 

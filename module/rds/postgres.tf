@@ -34,15 +34,16 @@ resource "random_password" "db_master_pass"{
   special          = true
   override_special = "_!%^"
 }
-## Create random value as AWS SecretManager Secret name postfix
-resource "random_password" "sm_postfix"{
-  length           = 5
+## Create random value as AWS SecretManager Secret name postfix and RDS final Snap
+resource "random_string" "sm_postfix"{
+  length           = 8
   special          = false
+  override_special = "-"
 }
 
 ## Create secret in Password manager
 resource "aws_secretsmanager_secret" "db_password" {
-  name = "${var.cm_db_pass_prefix}-${random_password.sm_postfix.result}"
+  name = "${var.cm_db_pass_prefix}-${random_string.sm_postfix.result}"
 }
 ## Set the secret version with value of the random generator
 resource "aws_secretsmanager_secret_version" "password" {
@@ -146,7 +147,7 @@ resource "aws_db_instance" "postgress_database" {
     db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
     vpc_security_group_ids = [data.aws_security_group.private_sg.id]
     iam_database_authentication_enabled = true
-    final_snapshot_identifier = "${random_password.sm_postfix.result}"
+    final_snapshot_identifier = "${random_string.sm_postfix.result}"
     skip_final_snapshot = false
     copy_tags_to_snapshot = true
     monitoring_role_arn = aws_iam_role.rds_role.arn

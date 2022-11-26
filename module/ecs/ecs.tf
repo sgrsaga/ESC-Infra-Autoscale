@@ -16,23 +16,139 @@ data "aws_subnets" "public_subnets" {
 }
 
 ############## Use available roles to link to user or service
+
+## Create ecsServiceRole role with Policy "AmazonEC2ContainerServiceRole"
+/*
 data "aws_iam_role" "role_ecsServiceRole" {
   name = "ecsServiceRole"
 }
+data "aws_iam_policy" "AmazonEC2ContainerServiceRolePolicy" {
+  arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"  
+}
+*/
+resource "aws_iam_role" "ecsServiceRole" {
+  name = "ecsServiceRoleNew"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2008-10-17",
+    "Statement": [
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "ecs.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "EcsEc2PolicyRoleAttach" {
+  role       = aws_iam_role.ecsServiceRole.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
+}
+
+## Create ecsTaskExecutionRole role with Policy "AmazonECSTaskExecutionRolePolicy"
+/*
 data "aws_iam_role" "role_ecsTaskExecutionRole" {
   name = "ecsTaskExecutionRole"
 }
+*/
+resource "aws_iam_role" "ecsTaskExecutionRole" {
+  name = "ecsTaskExecutionRoleNew"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2008-10-17",
+    "Statement": [
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "ecs-tasks.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "EcsTaskExcPolicyRoleAttach" {
+  role       = aws_iam_role.ecsTaskExecutionRole.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+## Create ecsAutoscaleRole role with Policy "AmazonEC2ContainerServiceAutoscaleRole"
+/*
 data "aws_iam_role" "role_ecsAutoscaleRole" {
   name = "ecsAutoscaleRole"
 }
+
+resource "aws_iam_role" "ecsAutoscaleRole" {
+  name = "ecsAutoscaleRoleNew"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "application-autoscaling.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "EcsServiceAutoScalePolicyRoleAttach" {
+  role       = aws_iam_role.ecsAutoscaleRole.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
+}
+*/
+
+## Create ecsInstanceRole role with Policy "AmazonEC2ContainerServiceforEC2Role"
+/*
 data "aws_iam_role" "role_ecsInstanceRole" {
   name = "ecsInstanceRole"
 }
+*/
+resource "aws_iam_role" "ecsInstanceRole" {
+  name = "ecsInstanceRoleNew"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2008-10-17",
+    "Statement": [
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "ec2.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "Ec2ContainerServicePolicyRoleAttach" {
+  role       = aws_iam_role.ecsInstanceRole.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+##---------------
 
 # Create Instance Profile for ECS EC2 instances to use in Launch Configuration
 resource "aws_iam_instance_profile" "ecs_agent_profile" {
   name = "ecs-agent"
-  role = data.aws_iam_role.role_ecsInstanceRole.name
+  role = aws_iam_role.ecsInstanceRole.name
 }
 
 ## Create S3 bucket for access_logs
@@ -186,7 +302,7 @@ resource "aws_ecs_cluster" "project_cluster" {
 # Task definitions to use in Service
 resource "aws_ecs_task_definition" "project_task" {
   family = "project_task"
-  execution_role_arn = data.aws_iam_role.role_ecsTaskExecutionRole.arn
+  execution_role_arn = aws_iam_role.ecsTaskExecutionRole.arn
   container_definitions = jsonencode([
     {
       name      = "AppTask"
@@ -281,7 +397,7 @@ resource "aws_ecs_service" "service_node_app" {
   desired_count   = 1
   launch_type = "EC2"
   health_check_grace_period_seconds = 300
-  iam_role        = data.aws_iam_role.role_ecsServiceRole.arn
+  iam_role        = aws_iam_role.ecsServiceRole.arn
   depends_on      = [
     aws_ecs_cluster.project_cluster, 
     aws_ecs_task_definition.project_task,

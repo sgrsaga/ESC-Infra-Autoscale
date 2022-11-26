@@ -143,11 +143,17 @@ resource "aws_iam_role_policy_attachment" "Ec2ContainerServicePolicyRoleAttach" 
   role       = aws_iam_role.ecsInstanceRoleNew.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
-##---------------
+##----------------------------------##
 
+## Create random value to set for IAM instance profile
+resource "random_string" "instance_profile"{
+  length           = 8
+  special          = false
+  override_special = "-"
+}
 # Create Instance Profile for ECS EC2 instances to use in Launch Configuration
 resource "aws_iam_instance_profile" "ecs_agent_profile" {
-  name = "ecsagent"
+  name = "ecsagent-${random_string.instance_profile.result}"
   role = aws_iam_role.ecsInstanceRoleNew.name
 }
 

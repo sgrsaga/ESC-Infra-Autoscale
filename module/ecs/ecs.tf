@@ -147,7 +147,7 @@ resource "aws_iam_role_policy_attachment" "Ec2ContainerServicePolicyRoleAttach" 
 
 # Create Instance Profile for ECS EC2 instances to use in Launch Configuration
 resource "aws_iam_instance_profile" "ecs_agent_profile" {
-  name = "ecs-agent"
+  name = "ecsagent"
   role = aws_iam_role.ecsInstanceRoleNew.name
 }
 

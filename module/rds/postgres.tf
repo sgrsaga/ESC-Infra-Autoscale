@@ -147,7 +147,7 @@ resource "aws_db_instance" "postgress_database" {
     db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
     vpc_security_group_ids = [data.aws_security_group.private_sg.id]
     iam_database_authentication_enabled = true
-    final_snapshot_identifier = "${random_string.sm_postfix.result}"
+    final_snapshot_identifier = "final_snap_${random_string.sm_postfix.result}"
     skip_final_snapshot = false
     copy_tags_to_snapshot = true
     monitoring_role_arn = aws_iam_role.rds_role.arn

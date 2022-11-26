@@ -35,7 +35,7 @@ module "iam" {
   source = "./module/iam"
   username = var.username  
 }
-
+/*
 ## 2. Call the Network module to generate VPC components
 module "main_network" {
   source = "./module/network"
@@ -110,3 +110,4 @@ module "monitor_and_alarm" {
   ]
   
 }
+*/

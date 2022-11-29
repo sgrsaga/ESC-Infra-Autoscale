@@ -110,9 +110,6 @@ resource "aws_route_table_association" "public_rt_subnet_association" {
   count = length(var.public_subnets) > 0 ? length(var.public_subnets) : 0
   route_table_id = aws_route_table.public_route.id
   subnet_id = element(aws_subnet.public_subnet.*.id, count.index )
-  depends_on = [
-    aws_subnet.public_subnet
-  ]
 }
 
 
@@ -135,9 +132,6 @@ resource "aws_route_table_association" "private_rt_subnet_association" {
   count = length(var.private_subnets) > 0 ? length(var.private_subnets) : 0
   route_table_id = aws_route_table.private_route.id
   subnet_id = element(aws_subnet.private_subnet.*.id, count.index )
-  depends_on = [
-    aws_subnet.private_subnet
-  ]
 }
 
 

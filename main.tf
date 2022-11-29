@@ -30,12 +30,12 @@ provider "aws" {
 }
 
 
-## 1. Call IAM user create module to create user profile for profbob
-module "iam" {
-  source = "./module/iam"
-  username = var.username  
-}
-/*
+# ## 1. Call IAM user create module to create user profile for profbob
+# module "iam" {
+#   source = "./module/iam"
+#   username = var.username  
+# }
+
 ## 2. Call the Network module to generate VPC components
 module "main_network" {
   source = "./module/network"
@@ -52,15 +52,15 @@ module "main_network" {
   private_rt = var.private_rt
 }
 
-## 3. Call Databse creation module
-module "pg_database" {
-  source = "./module/rds"
-  db_identifier = var.db_identifier
-  vpc_id = module.main_network.vpc_id
-  db_name = var.db_name
-  db_subnet_group_name = var.db_subnet_group_name
-  depends_on = [module.main_network] 
-}
+# ## 3. Call Databse creation module
+# module "pg_database" {
+#   source = "./module/rds"
+#   db_identifier = var.db_identifier
+#   vpc_id = module.main_network.vpc_id
+#   db_name = var.db_name
+#   db_subnet_group_name = var.db_subnet_group_name
+#   depends_on = [module.main_network] 
+# }
 
 
 ## 4. Call ECS creation module
@@ -110,4 +110,3 @@ module "monitor_and_alarm" {
   ]
   
 }
-*/

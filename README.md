@@ -15,3 +15,6 @@ Manual actions
 * Tag the image to match for the ECR repo. In this case as below
     # docker tag sgrsaga/project_repo_aws:latest project_repo_aws:latest
 * Then you can use the ECR push image commands to push the image to ECR Repository
+
+Architecture:
+
